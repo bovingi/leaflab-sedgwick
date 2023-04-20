@@ -1,0 +1,253 @@
+---
+title: "Untitled"
+author: "Gabe Runte"
+date: "4/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dada2)
+library(tidyverse)
+library(here)
+library(ShortRead)
+```
+
+```{r, message=FALSE}
+path <- here("Illumina", "GR_MoellerLab", "fastqs")
+```
+
+```{r}
+list.files(path)
+```
+
+```{r}
+fnFs <- sort(list.files(path, pattern = "_R1_001.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern = "_R2_001.fastq", full.names = TRUE))
+
+FWD <- "CTHGGTCATTTAGAGGAASTAA"
+REV <- "CTRYGTTCTTCATCGDT"
+
+allOrients <- function(primer) {
+    # Create all orientations of the input sequence
+    require(Biostrings)
+    dna <- DNAString(primer)  # The Biostrings works w/ DNAString objects rather than character vectors
+    orients <- c(Forward = dna, Complement = complement(dna), Reverse = reverse(dna), 
+        RevComp = reverseComplement(dna))
+    return(sapply(orients, toString))  # Convert back to character vector
+}
+FWD.orients <- allOrients(FWD)
+REV.orients <- allOrients(REV)
+FWD.orients
+
+fnFs.filtN <- file.path(path, "filtN", basename(fnFs)) # Put N-filterd files in filtN/ subdirectory
+fnRs.filtN <- file.path(path, "filtN", basename(fnRs))
+filterAndTrim(fnFs, fnFs.filtN, fnRs, fnRs.filtN, maxN = 1, multithread = TRUE)
+
+primerHits <- function(primer, fn) {
+    # Counts number of reads in which the primer is found
+    nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
+    return(sum(nhits > 0))
+}
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[1]]), 
+    FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[1]]), 
+    REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.filtN[[1]]), 
+    REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.filtN[[1]]))
+```
+
+```{r}
+cutadapt <-  "/Users/Gabe/opt/anaconda3/envs/cutadapt/bin/cutadapt"
+
+system2(cutadapt, args = "--version") # Run shell commands from R
+
+path.cut <- file.path(path, "cutadapt")
+if(!dir.exists(path.cut)) dir.create(path.cut)
+fnFs.cut <- file.path(path.cut, basename(fnFs))
+fnRs.cut <- file.path(path.cut, basename(fnRs))
+
+FWD.RC <- dada2:::rc(FWD)
+REV.RC <- dada2:::rc(REV)
+# Trim FWD and the reverse-complement of REV off of R1 (forward reads)
+R1.flags <- paste("-g", FWD, "-a", REV.RC) 
+# Trim REV and the reverse-complement of FWD off of R2 (reverse reads)
+R2.flags <- paste("-G", REV, "-A", FWD.RC) 
+# Run Cutadapt
+for(i in seq_along(fnFs)) {
+  system2(cutadapt, args = c(R1.flags, R2.flags, "-n", 2, # -n 2 required to remove FWD and REV from reads
+                             "-o", fnFs.cut[i], "-p", fnRs.cut[i], # output files
+                             fnFs.filtN[i], fnRs.filtN[i])) # input files
+}
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[1]]), 
+    FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.cut[[1]]), 
+    REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.cut[[1]]), 
+    REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.cut[[1]]))
+
+```
+
+```{r}
+# Forward and reverse fastq filenames have the format:
+cutFs <- sort(list.files(path.cut, pattern = "R1_001.fastq", full.names = TRUE))
+cutRs <- sort(list.files(path.cut, pattern = "R2_001.fastq", full.names = TRUE))
+
+# Extract sample names, assuming filenames have format:
+get.sample.name <- function(fname) strsplit(basename(fname), "_")[[1]][1]
+sample.names <- unname(sapply(cutFs, get.sample.name))
+head(sample.names)
+
+```
+
+
+```{r}
+
+plotQualityProfile(cutFs[1:2])
+plotQualityProfile(cutRs[1:2])
+
+```
+
+```{r}
+filtFs <- file.path(path.cut, "filtered", basename(cutFs))
+filtRs <- file.path(path.cut, "filtered", basename(cutRs))
+```
+
+
+```{r filter and trim}
+out <- filterAndTrim(cutFs, filtFs, cutRs, filtRs, maxN = 0, maxEE = c(2, 2), 
+    truncQ = 2, minLen = 50, rm.phix = TRUE, compress = TRUE, multithread = TRUE)  # on windows, set multithread = FALSE
+head(out)
+```
+
+```{r}
+errF <- learnErrors(filtFs, multithread = TRUE)
+```
+
+```{r}
+errR <- learnErrors(filtRs, multithread = TRUE)
+```
+
+```{r}
+
+plotErrors(errF, nominalQ = TRUE)
+```
+
+```{r}
+derepFs <- derepFastq(filtFs, verbose = TRUE)
+derepRs <- derepFastq(filtRs, verbose = TRUE)
+# Name the derep-class objects by the sample names
+names(derepFs) <- sample.names
+names(derepRs) <- sample.names
+
+```
+
+```{r}
+dadaFs <- dada(derepFs, err = errF, multithread = TRUE)
+dadaRs <- dada(derepRs, err = errR, multithread = TRUE)
+```
+
+```{r}
+mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose=TRUE)
+```
+
+```{r}
+seqtab <- makeSequenceTable(mergers)
+dim(seqtab)
+```
+
+```{r}
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+table(nchar(getSequences(seqtab.nochim)))
+```
+
+```{r}
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, 
+    getN), rowSums(seqtab.nochim))
+# If processing a single sample, remove the sapply calls: e.g. replace
+# sapply(dadaFs, getN) with getN(dadaFs)
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", 
+    "nonchim")
+rownames(track) <- sample.names
+head(track)
+seq.tab2 <- as.data.frame( (seqtab.nochim))
+names <- paste("Seq", seq(1:length(seq.tab2[1,])))
+names(seq.tab2)<- names
+#write.csv(t(seq.tab2), "written.csv")
+
+head(seq.tab2)
+
+dim(seqtab.nochim)
+#taxa<- read.csv("taxon.csv")
+uniquesToFasta(getUniques(seqtab.nochim), "uniques.fasta", ids=paste0("Seq", seq(length(getUniques(seqtab.nochim)))))
+```
+
+```{r trying to change OTU threshold}
+nproc <- 10 # set to number of cpus/processors to use for the clustering
+
+asv_sequences <- colnames(seqtab.nochim)
+sample_names <- rownames(seqtab.nochim)
+dna <- Biostrings::DNAStringSet(asv_sequences)
+
+## Find clusters of ASVs to form the new OTUs
+aln <- DECIPHER::AlignSeqs(dna, processors = nproc)
+d <- DECIPHER::DistanceMatrix(aln, processors = nproc)
+clusters  <- DECIPHER::TreeLine(
+  myDistMatrix=d, 
+  method = "complete",
+  cutoff = 0.03, # use `cutoff = 0.03` for a 97% OTU 
+  type = "clusters",
+  processors = nproc) 
+
+## Use dplyr to merge the columns of the seqtab matrix for ASVs in the same OTU
+# prep by adding sequences to the `clusters` data frame
+clusters <- clusters %>%
+  add_column(sequence = asv_sequences)
+merged_seqtab <- seqtab %>%
+  # setup: turn seqtab into a tibble with rows = ASVs and columns = samples
+  t %>%
+  as_tibble(rownames = "sequence") %>%
+  # add the cluster information
+  left_join(clusters, by = "sequence") %>%
+  # merge ASVs in the same cluster, summing abundances within samples
+  group_by(cluster) %>%
+  summarize_at(vars(-sequence), sum) %>%
+  # Set new taxa names to OTU<cluster #> 
+  mutate(cluster = paste0("OTU", cluster)) %>%
+  # convert back to a matrix in the original orientation
+  column_to_rownames("cluster") %>%
+  as("matrix") %>%
+  t
+
+```
+
+```{r create OTUs,  include=FALSE}
+write.csv(merged_seqtab, file= here("data", "otu_tab.csv"))
+```
+
+```{r}
+otu.tab <- read_csv(here("data", "otu_tab.csv"))
+otu.tab <- t(otu.tab)
+colnames(otu.tab)<- otu.tab[1,]
+otu.tab <- otu.tab[-1,]
+
+write.csv(otu.tab, file= here("data", "otu_tab_cleaned.csv"))
+```
+
+```{r}
+
+unite.ref <- "/Users/Gabe/Desktop/masters/ghecto/data/sh_general_release_all_10.05.2021/sh_general_release_dynamic_all_10.05.2021.fasta"
+seqs <- as.vector(clusters$sequence)
+taxa <- assignTaxonomy(seqs, unite.ref, multithread = TRUE, tryRC = TRUE)
+write.csv(taxa, file=here("data", "sos_rnacores.csv") )
+taxa.tib = read_csv(here("data", "sos_rnacores.csv")) 
+taxa.tib = taxa.tib
+names(taxa.tib)[1] = "sequence"
+
+write.csv(taxa, here("data", "unite_sosrna_otus.csv"))
+
+
+otu_taxa <- clusters %>% 
+  full_join(taxa.tib) 
+
+write_csv(clusters, here("data", "otu_clusters.csv"))
+
+
+```

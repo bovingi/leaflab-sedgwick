@@ -1,0 +1,356 @@
+---
+title: "OTU goodness"
+author: "Gabe Runte"
+date: "4/16/2023"
+output: html_document
+---
+#Libraries
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(phyloseq)
+library(metagenomeSeq)
+library(vegan)
+library(here)
+library(janitor)
+library(gridExtra)
+library(indicspecies)
+```
+
+#Datasets
+```{r datasets, message=FALSE, warning=FALSE}
+#reading in data
+taxon.path <- read_csv(here('data', "sequencing", 'unite_sosrna_otus.csv'))%>%  # taxon path output from UNITE 
+  clean_names() %>% 
+  dplyr::rename(sequence = x1)
+
+funguilds <- read_csv(here('data', "sequencing", 'sos_rna_forfunguild.guilds.csv')) %>%  # guild data output from FUNGuild
+ clean_names() %>%
+  select(!taxonomy) 
+
+guilds_taxonomy = funguilds %>% 
+  left_join(taxon.path, by = "sequence")
+
+otu_clusters = read_csv(here("data", "sequencing", "otu_clusters.csv")) 
+
+funguilds_otu = funguilds %>%
+left_join(otu_clusters, by = "sequence") %>% 
+rename(otu = cluster) %>% 
+  mutate(otu_full = paste("OTU", otu, sep = ""))
+
+funguild_filtered = funguilds_otu[match(unique(funguilds_otu$otu_full), funguilds_otu$otu_full),] 
+
+ 
+asv.tab <- read_csv(here('data',"sequencing", 'otu_tab.csv')) # otu table output from DADA2 and DECIPHER
+rownames(asv.tab) <- pull(asv.tab, ...1)
+sample_names =  pull(asv.tab, ...1)
+
+asv.tib = asv.tab %>%
+  t() %>% 
+  as_tibble()
+rownames(asv.tib) = colnames(asv.tab)
+asv.tib_wide = asv.tib  %>%
+  filter(!row_number() %in% c(1, 2624) )%>% 
+  bind_cols(funguild_filtered %>% 
+              arrange(otu))
+
+```
+
+```{r metadata stuff}
+#just before repotting
+metadata = read_csv(here("data", "Datasheets_and_Templates - SoilCoreMetadata.csv")) %>% 
+  clean_names()
+nutrients = read_csv(here("data", "sedgwick_nutrients.csv")) %>% 
+  clean_names() %>% 
+  mutate(tree_id = as.numeric(str_sub(name, 2, 5)))
+nutes = nutrients[match(unique(nutrients$name), nutrients$name),] #taking first occurrence for the time being. can take a mean or something if desired
+shift = read_csv(here("raw-data", "SHIFT_summary20230420.csv")) %>% 
+  filter(week == 33) %>% 
+  rename(tree_id = tree) %>% 
+  select(c(2,4,5,9,10)) %>% 
+  pivot_wider(names_from = time, values_from = c(mpa_mean, lwc_mean)) %>% 
+  select(1:4, 6,7)
+
+df = metadata %>% 
+  select(1:4, 6) %>% 
+  left_join(nutes) %>% 
+  separate(sos_core_id, into = c("sample", "sos_id")) %>% 
+  mutate(sos_id = as.numeric(sos_id)) %>% 
+  mutate(sample = paste(sample, sos_id, sep = "-")) %>% 
+  left_join(shift) %>% 
+  filter(!is.na(date)) %>% 
+  filter(!is.na(mpa_mean_md))
+
+
+```
+
+```{r prep final metadata file for phyloseq}
+metadata <- df
+
+sample_table <-metadata
+rownames(sample_table)<- sample_table$sample
+```
+
+
+
+##Subsetting by FUNGuild confidence ranking. Taking only higher confidence assignments into asv.assigned
+```{r subsetting data, warning=FALSE, message=FALSE}
+#The below line of code filters out all unassigned taxa from all following analyses
+asv.tib_wide = asv.tib_wide %>% 
+  filter(taxon != "-")
+
+probable.guild <- asv.tib_wide %>% 
+  filter(confidence_ranking == "Probable") 
+highlyprobable.guild <- asv.tib_wide %>% 
+  filter(confidence_ranking == "Highly Probable")
+asv.conf <- bind_rows(probable.guild, highlyprobable.guild)
+
+#asv.tab.conf <- asv.conf[,1:110] #subsetting to just columns containining numerical ASV values
+
+asv.conf.sym <- asv.conf %>% #filter by any trophic mode containing 'symbiotroph"
+  dplyr::filter(grepl("Symbiotroph",trophic_mode))
+asv.total.sym <- asv.tib_wide %>% #filter by any trophic mode containing 'symbiotroph"
+  dplyr::filter(grepl("Symbiotroph",trophic_mode))
+asv.conf.ect <- asv.conf %>% #filter by any guild assignment containing 'Ectomycorrhizal'
+  dplyr::filter(grepl("Ectomycorrhizal",guild))
+asv.total.ect <- asv.tib_wide %>% #filter by any guild assignment containing 'Ectomycorrhizal'
+  dplyr::filter(grepl("Ectomycorrhizal",guild))
+asv.conf.sap <- asv.conf %>% #filter by any guild assignment containing 'Ectomycorrhizal'
+  dplyr::filter(grepl("Saprotroph",guild))
+asv.total.sap <- asv.tib_wide %>% #filter by any guild assignment containing 'Ectomycorrhizal'
+  dplyr::filter(grepl("Saprotroph",guild))
+
+# #subsetting to just rows containining numerical ASV values
+# asv.tab.conf.sym <- asv.conf.sym[,1:110] %>% 
+#   mutate_if(is.character, as.numeric)
+# rownames(asv.tab.conf.sym) <- rownames(asv.conf.sym)
+# 
+# asv.tab.total.sym <- asv.total.sym[,1:110] %>% 
+#   mutate_if(is.character, as.numeric)
+# rownames(asv.tab.total.sym) <- rownames(asv.total.sym)
+# 
+# asv.tab.conf.ect <- asv.conf.ect[,1:110] %>% 
+#   mutate_if(is.character, as.numeric)
+# rownames(asv.tab.conf.ect) <- rownames(asv.conf.ect)
+# 
+# asv.tab.total.ect <- asv.total.ect[,1:110]%>% 
+#   mutate_if(is.character, as.numeric)
+# rownames(asv.tab.total.ect) <- rownames(asv.total.ect)
+# 
+# asv.tab.conf.sap <- asv.conf.sap[,1:110]%>% 
+#   mutate_if(is.character, as.numeric)
+# rownames(asv.tab.conf.sap) <- rownames(asv.conf.sap)
+# 
+# asv.tab.total.sap <- asv.total.sap[,1:110]%>% 
+#   mutate_if(is.character, as.numeric)
+# rownames(asv.tab.total.sap) <- rownames(asv.total.sap)
+```
+
+
+##loading asv/otu table and changing sample name format 
+```{r prepare OTU tables}
+OTU_table_all <- data.matrix(asv.tib)
+OTU_table_sym <- data.matrix(asv.total.sym)
+OTU_table_ect <- data.matrix(asv.total.ect)
+OTU_table_sap <- data.matrix(asv.total.sap)
+```
+
+
+```{r}
+#subset to samples with >500 reads 
+OTU_sums_all <- colSums(OTU_table_all)
+OTU_sums_sym <- colSums(OTU_table_sym)
+OTU_sums_ect <- colSums(OTU_table_ect)
+OTU_sums_sap <- colSums(OTU_table_sap)
+
+otu_500_all <- OTU_sums_all>1
+otu_500_sym <- OTU_sums_sym>1
+otu_500_ect <- OTU_sums_ect>1
+otu_500_sap <- OTU_sums_sap>1
+
+OTU_table_all <- OTU_table_all[,otu_500_all]
+OTU_table_sym <- OTU_table_sym[,otu_500_sym]
+OTU_table_ect <- OTU_table_ect[,otu_500_ect]
+OTU_table_sap <- OTU_table_sap[,otu_500_sap]
+
+OTU_table_all <- OTU_table_all[,which(colnames(OTU_table_all) %in% rownames(sample_table))]
+OTU_table_sym <- OTU_table_sym[,which(colnames(OTU_table_sym) %in% rownames(sample_table))]
+OTU_table_ect <- OTU_table_ect[,which(colnames(OTU_table_ect) %in% rownames(sample_table))]
+OTU_table_sap <- OTU_table_sap[,which(colnames(OTU_table_sap) %in% rownames(sample_table))]
+``` 
+
+
+
+
+```{r create all sample tables, warning = FALSE}
+sample_table_all <- sample_table[which(sample_table$sample %in% colnames(OTU_table_all)),]
+sample_table_sym <- sample_table[which(sample_table$sample %in% colnames(OTU_table_sym)),]
+sample_table_ect <- sample_table[which(sample_table$sample %in% colnames(OTU_table_ect)),]
+sample_table_sap <- sample_table[which(sample_table$sample %in% colnames(OTU_table_sap)),]
+
+physt_all = sample_data(sample_table_all);sample_names(physt_all) = sample_table_all$sample
+physt_sym = sample_data(sample_table_sym);sample_names(physt_sym) = sample_table_sym$sample
+physt_ect = sample_data(sample_table_ect);sample_names(physt_ect) = sample_table_ect$sample
+physt_sap = sample_data(sample_table_sap);sample_names(physt_sap) = sample_table_sap$sample
+
+```
+
+
+
+
+Phyloseq OTU tables for each subset and transect
+```{r transect-specific sets for phylo, warning=FALSE }
+otu.all <- OTU_table_all
+phyotu.all <- otu_table(otu.all, taxa_are_rows = TRUE)
+
+otu.sym <- OTU_table_sym
+phyotu.sym <- otu_table(otu.sym, taxa_are_rows = TRUE)
+
+otu.ect <- OTU_table_ect
+phyotu.ect <- otu_table(otu.ect, taxa_are_rows = TRUE)
+
+otu.sap <- OTU_table_sap
+phyotu.sap <- otu_table(otu.sap, taxa_are_rows = TRUE)
+```
+
+
+Phyloseq object for each subset and transect
+```{r create phyloseq objects}
+phy_all <- phyloseq(phyotu.all, physt_all)
+phy_sym <- phyloseq(phyotu.sym, physt_sym)
+phy_ect <- phyloseq(phyotu.ect, physt_ect)
+phy_sap <- phyloseq(phyotu.sap, physt_sap)
+```
+
+```{r switch otu to rra}
+phy_all = transform_sample_counts(phy_all, function(x) x/sum(x))
+phy_sym = transform_sample_counts(phy_sym, function(x) x/sum(x))
+phy_ect = transform_sample_counts(phy_ect, function(x) x/sum(x))
+phy_sap = transform_sample_counts(phy_sap, function(x) x/sum(x))
+```
+
+```{r load function metagenome}
+make_metagenomeSeq = function(physeq) {
+  require("metagenomeSeq")
+  require("phyloseq")
+  # Enforce orientation
+  if (!taxa_are_rows(physeq)) {
+    physeq <- t(physeq)}
+  OTU = as(otu_table(physeq), "matrix")
+  # Convert sample_data to AnnotatedDataFrame
+  ADF = AnnotatedDataFrame(data.frame(sample_data(physeq)))
+  # define dummy 'feature' data for OTUs, using their name Helps with
+  # extraction and relating to taxonomy later on.
+  TDF = AnnotatedDataFrame(data.frame(OTUname = taxa_names(physeq), row.names = taxa_names(physeq)))
+  # Create the metagenomeSeq object
+  MGS = newMRexperiment(counts = OTU, phenoData = ADF, featureData = TDF)
+  # Trigger metagenomeSeq to calculate its Cumulative Sum scaling factor.
+  MGS = cumNorm(MGS,p=cumNormStat(MGS))
+  return(MGS)
+}
+```
+
+```{r prepare and run MDS, message=FALSE, echo=false}
+phy_all = subset_samples(phy_all, sample != "SOS-13")
+phy_all = subset_samples(phy_all, sample != "SOS-14")
+
+phy_sym = subset_samples(phy_sym, sample != "SOS-13")
+phy_sym = subset_samples(phy_sym, sample != "SOS-14")
+
+phy_ect = subset_samples(phy_ect, sample != "SOS-13")
+phy_ect = subset_samples(phy_ect, sample != "SOS-14")
+
+phy_sap = subset_samples(phy_sap, sample != "SOS-13")
+phy_sap = subset_samples(phy_sap, sample != "SOS-14")
+
+meta.all<-make_metagenomeSeq(phy_all)
+meta.sym<-make_metagenomeSeq(phy_sym)
+meta.ect<-make_metagenomeSeq(phy_ect)
+meta.sap<-make_metagenomeSeq(phy_sap)
+
+css.all <-MRcounts(meta.all, norm= TRUE, log= TRUE)
+css.sym <-MRcounts(meta.sym, norm= TRUE, log= TRUE)
+css.ect <-MRcounts(meta.ect, norm= TRUE, log= TRUE)
+css.sap <-MRcounts(meta.sap, norm= TRUE, log= TRUE)
+
+csst.all <- t(css.all)
+csst.sym <- t(css.sym)
+csst.ect <- t(css.ect)
+csst.sap <- t(css.sap)
+
+dist.all <- vegdist(csst.all, method= "bray", binary=FALSE, diag=TRUE, upper=TRUE)
+dist.sym <- vegdist(csst.sym, method= "bray", binary=FALSE, diag=TRUE, upper=TRUE)
+dist.ect <- vegdist(csst.ect, method= "bray", binary=FALSE, diag=TRUE, upper=TRUE)
+dist.sap <- vegdist(csst.sap, method= "bray", binary=FALSE, diag=TRUE, upper=TRUE)
+
+set.seed(209)
+mds.all <- metaMDS(dist.all, distance = "bray", k=2, trymax = 1000)
+mds.sym <- metaMDS(dist.sym, distance = "bray", k=2, trymax = 1000)
+mds.ect <- metaMDS(dist.ect, distance = "bray", k=2, trymax = 1000)
+mds.sap <- metaMDS(dist.sap, distance = "bray", k=2, trymax = 1000)
+```
+
+```{r building data.scores, message=FALSE}
+data.scores.all <- as.data.frame(scores(mds.all))
+data.scores.sym <- as.data.frame(scores(mds.sym))
+data.scores.ect <- as.data.frame(scores(mds.ect))
+data.scores.sap <- as.data.frame(scores(mds.sap))
+
+data.scores.all$sample <- rownames(data.scores.all)
+data.scores.sym$sample <- rownames(data.scores.sym)
+data.scores.ect$sample <- rownames(data.scores.ect)
+data.scores.sap$sample <- rownames(data.scores.sap)
+
+
+
+nmds_all = metadata %>% 
+  left_join(data.scores.all)
+
+nmds_sym = metadata %>% 
+  left_join(data.scores.sym)
+
+nmds_ect = metadata %>% 
+  left_join(data.scores.ect)
+
+nmds_sap = metadata %>% 
+  left_join(data.scores.sap)
+
+```
+
+
+
+```{r}
+ggplot(nmds_all, aes(x= NMDS1, y= NMDS2)) + 
+  geom_point(aes(color = tree_species, shape = uphill_downhill))
+
+ggplot(nmds_sym, aes(x= NMDS1, y= NMDS2)) + 
+  geom_point(aes(color = tree_species, shape = uphill_downhill))
+
+ggplot(nmds_ect, aes(x= NMDS1, y= NMDS2)) + 
+  geom_point(aes(color = tree_species, shape = uphill_downhill))
+
+ggplot(nmds_sap, aes(x= NMDS1, y= NMDS2)) + 
+  geom_point(aes(color = tree_species, shape = uphill_downhill))
+```
+
+```{r}
+dist_matrix_all <- phyloseq::distance(phy_all, method = "bray")
+adonis2(dist_matrix_all~sample_data(phy_all)$tree_species+sample_data(phy_all)$soil_pct_moist+sample_data(phy_all)$bray_i_p_ppm+sample_data(phy_all)$nitrogen_percent)
+
+dist_matrix_sym <- phyloseq::distance(phy_sym, method = "bray")
+adonis2(dist_matrix_all~sample_data(phy_sym)$tree_species+sample_data(phy_sym)$soil_pct_moist+sample_data(phy_sym)$bray_i_p_ppm+sample_data(phy_sym)$c_n_ratio)
+
+dist_matrix_ect <- phyloseq::distance(phy_ect, method = "bray")
+adonis2(dist_matrix_all~sample_data(phy_ect)$tree_species+sample_data(phy_ect)$soil_pct_moist+sample_data(phy_ect)$bray_i_p_ppm+sample_data(phy_ect)$c_n_ratio)
+
+dist_matrix_sap <- phyloseq::distance(phy_sap, method = "bray")
+adonis2(dist_matrix_all~sample_data(phy_sap)$tree_species+sample_data(phy_sap)$soil_pct_moist+sample_data(phy_sap)$bray_i_p_ppm+sample_data(phy_sap)$c_n_ratio)
+
+
+
+adonis2(dist_matrix_all~sample_data(phy_sym)$mpa_mean_md+sample_data(phy_sym)$tree_species+sample_data(phy_sym)$soil_pct_moist+sample_data(phy_sym)$bray_i_p_ppm+sample_data(phy_sym)$c_n_ratio)
+
+adonis2(dist_matrix_sym~sample_data(phy_sym)$mpa_mean_md)
+```
+
+
