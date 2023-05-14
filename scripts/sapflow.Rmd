@@ -1,0 +1,190 @@
+---
+title: "Untitled"
+author: "Indra Boving"
+date: "2023-05-02"
+output: html_document
+---
+
+#Setup
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(janitor)
+library(calecopal)
+library(lubridate)
+```
+
+#Data
+
+```{r}
+mpa_sapflow_data <- read_csv(here("raw-data", "SHIFT_summary20230420.csv"), show_col_types = FALSE) %>% 
+  select(tree, week, time, mpa_mean) %>% 
+  drop_na(mpa_mean) %>% 
+  distinct() %>% 
+  pivot_wider(names_from = "time", values_from = "mpa_mean") %>% 
+  mutate(pressure_grad = pd - md)
+```
+
+#Data wrangling
+
+#Sapflow data:
+
+```{r}
+sapflow_03312022 <- read.csv(here("raw-data", "3.25.22", "")) %>% clean_names() 
+sapflow_06012022 <- read.csv(here("processed-data", "sapflow_06012022.csv")) %>% clean_names()
+```
+
+
+```{r}
+#From Lee: 
+  # ALSO NOTE: This needs to be 'zeroed' at bare minimum to believe the absolute values
+  #       i.e. take the min value at night after the rain on 3/28 and subtract it from everything 
+  #       so that it reaches 0 sapflow when we know there was zero sap flow.
+  # ALSO NOTE: something happened at RT when we installed 2010 in March 24. 
+  #       Looks like maybe something funky happened when we daisy chained them and 2081 crapped out?
+  #       almost exact time 2381 craps out, 82 and 84 have weird noise...
+
+sapflow_raw <- rbind(sapflow_03312022, sapflow_06012022) %>% 
+  mutate(date_sapflow = date(date_time), 
+         week = week(date_sapflow)) 
+#%>% 
+  # filter(#week %in% c(11, 13, 15, 17, 21),
+  #        tree %in% c(2343, 2356, 2347, 2365, 2367, 2369)) 
+
+#finding minimum sapflow for each tree:
+min_flow_0328 <- sapflow_raw %>% 
+  select(tree, sapflow, date_sapflow) %>% 
+  filter(date_sapflow == "2022-03-28") %>% 
+  group_by(tree) %>% 
+  slice(which.min(sapflow)) %>% 
+  select(tree, sapflow) %>% 
+  transmute(min_sapflow = sapflow) %>% 
+  mutate(tree = as.numeric(tree))
+  
+# #using minimum to zero: 
+# sapflow_df <- merge(sapflow_raw, min_flow_0328, by = c("tree")) %>% 
+#   group_by(tree) %>% 
+#   mutate(min_sapflow_all = min(sapflow, na.rm = T), #minimum of all dates (not just 0328)
+#         sapflow_zeroed = sapflow-min_sapflow, #zero based on 0328
+#          max_sapflow = max(sapflow, na.rm = T), #maximum sapflow across all dates
+#          max_sapflow_zeroed = max(sapflow_zeroed, na.rm = T)) %>% #maximym zeroed sapflow from all dates (use this!)
+#   mutate(tree = as.numeric(tree)) %>% 
+#   #ungroup() %>% 
+#   filter(tree %in% c(2343, 2356, 2347, 2365, 2367, 2369)) 
+
+#using minimum to zero: 
+sapflow_df <- merge(sapflow_raw, min_flow_0328, by = c("tree")) %>% 
+  group_by(tree) %>% 
+  mutate(min_sapflow_all = min(sapflow, na.rm = T), #minimum of all dates (not just 0328)
+        sapflow_zeroed = sapflow-min_sapflow, #zero based on 0328
+        max_sapflow = max(sapflow, na.rm = T), #maximum sapflow across all dates
+        max_sapflow_zeroed = max(sapflow_zeroed, na.rm = T)) %>% #maximum zeroed sapflow from all dates (use this!)
+  mutate(tree = as.numeric(tree)) %>% 
+  #ungroup() %>% 
+  filter(tree %in% c(2343, 2356, 2347, 2365, 2367, 2369)) %>% 
+  #select(-sapflow, -date_time, -sapflow_st, -install, -sapflow_zeroed) %>%
+  distinct()
+  
+# sapflow_wp <- merge(sapflow_df, sapflow_mpa, by = c("tree", "week")) %>% 
+#   group_by(tree, week) %>% 
+#   mutate(sapflow_zeroed_kg_sec = sapflow_zeroed*0.00020, #to get into kg/sec (collected as L/hr)
+#          pressure_driven_flow_kg_sec = sapflow_zeroed_kg_sec/pressure_grad, #to get into kg/sec/MPa
+#          pdf_normed_kg_sec = pressure_driven_flow_kg_sec/max_sapflow_zeroed) %>% 
+#   distinct()
+
+sapflow_wp <- merge(sapflow_df, sapflow_mpa, by = c("tree", "week")) %>% 
+  group_by(tree, week) %>% 
+  dplyr::mutate(sapflow_st_new = sapflow_zeroed/max_sapflow_zeroed, 
+         pdf_st = -1*(sapflow_st_new/pressure_grad)) %>% 
+  distinct() 
+
+sapflow_wp_summary <- sapflow_wp %>% 
+  group_by(tree, date_sapflow) %>% 
+  summarise(mean_sapflow = mean(sapflow_st_new))
+
+# sapmax <- sap %>% group_by(Tree) %>% summarize(max_sapflow = max(Sapflow, na.rm=T)) %>% clean_names()
+
+#pull max for days we have midday MPa, then divide max flow rate by pressure gradient (PD-MD), and normalize by Max to see if that changes over time;  Funky trees (2343 and 2346), but not necessarily wrong (just noisy); may need to smooth out the data -- take 11-3pm average for those days. 
+
+
+##do it as percent of max, so should be between 0-1
+```
+
+#####sapflow_fig
+```{r}
+sapflow_fig <- sapflow_wp_summary %>% 
+  ggplot(aes(y = mean_sapflow , x = date_sapflow)) +
+  geom_point(aes(color = as.factor(tree)))+ 
+ # geom_col()+
+  geom_smooth(method = "lm", se = T, color = "black") +
+  #geom_smooth(method = "loess", se = T, color = "black") +
+  #stat_summary(fun.y="mean", geom="line", aes(group=factor(tree), color = as.factor(tree))) +
+  #ggtitle("PLC over water potential space") +
+  ylab("Standardized Sapflow") +
+  xlab("Date") + 
+  th_colors +
+  th 
+  #ylim(-.25, 3) +
+ # theme(legend.position = "none") 
+
+sapflow_fig
+
+#ggsave(here("figures", "sapflow_fig.jpg"), plot = sapflow_fig, height = 4, width = 6, units = "in")
+```
+#####sapflow_fig_datetime
+```{r}
+sapflow_fig_datetime <- sapflow_wp %>% 
+  #mutate(date_time = parse_date_time(date_time, "Ymd HMS", truncated = 3)) +
+  ggplot(aes(y = sapflow_st_new, x = date_time)) +
+  geom_point(aes(color = as.factor(tree)), size = .5) + 
+ # geom_col()+
+  geom_smooth(method = "lm", se = T, color = "black") +
+  #geom_smooth(method = "loess", se = T, color = "black") +
+  #stat_summary(fun.y="mean", geom="line", aes(group=factor(tree), color = as.factor(tree))) +
+  #ggtitle("PLC over water potential space") +
+  ylab("Standardized Sapflow") +
+  xlab("Date") + 
+  scale_x_discrete(labels = NULL, breaks = NULL) + labs(x = "") + 
+  #scale_x_date(date_breaks = "2 weeks", date_labels = "%d %m")+
+  th_colors +
+  ylim(-.15, 1.15) +
+  theme(legend.position = "none") +
+  scale_color_manual(values=c( "#e5a335", "#556219", "#418979", "#2b614e", "#053c29"))
+
+
+
+#Degas = list(
+              #c("#591d06", "#96410e", "#e5a335", "#556219", "#418979", "#2b614e", "#053c29"), 
+           # c(5, 2, 1, 3, 4, 7, 6),
+            # c("brown", "darkorange", "yellow", "green", "teal", "darkteal", "darkgreen"), colorblind=FALSE))
+
+sapflow_fig_datetime
+
+ggsave(here("figures", "sapflow_fig_datetime.jpg"), plot = sapflow_fig_datetime, height = 4, width = 6, units = "in")
+```
+
+#####sapflow_ks_plot_final
+
+```{r, fig.height = 4, fig.width = 3}
+sap_plot <- cowplot::plot_grid(
+        sapflow_fig+ theme(plot.margin = unit(c(.25, 0, .25, .5), "cm")), 
+        ks_date_fig + theme(plot.margin = unit(c(0, 0, 0, 0), "cm")), 
+        align='vh', vjust=.5, scale = 1,
+        ncol = 1
+          )
+
+x.grob <- grid::textGrob("Midday Water Potential (MPa)", 
+                   gp=grid::gpar(fontface="bold", 
+                           col="black", 
+                           fontsize=15)
+                   )
+
+#add to plot
+sap_plot_final <- gridExtra::grid.arrange(arrangeGrob(sap_plot, bottom = x.grob)) 
+sap_plot_final
+
+ggsave(here("figures", "sap_plot.jpg"), plot = sap_plot_final, height = 6, width = 4, units = "in")
+```
+
+

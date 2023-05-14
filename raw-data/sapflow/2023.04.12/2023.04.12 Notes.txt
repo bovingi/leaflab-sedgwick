@@ -1,0 +1,14 @@
+Attempted to download from all dataloggers, but got an error from all Campbell Sci (see messages below):
+
+Failure: 4/14/2023 11:05:31.960
+   delivery failure received","timed out or resource error
+Failure: 4/14/2023 11:05:31.960
+   open failed","serial open failed","2","The system cannot find the file specified.
+Failure: 4/14/2023 11:05:33.108
+   delivery failure received","timed out or resource error
+Failure: 4/14/2023 11:05:33.108
+   open failed","serial open failed","2","The system cannot find the file specified.
+
+Replaced all batteries; this allowed me to download from the Edaphic loggers but the Campbell Sci still gave above error. Maybe need to replace the internal battery? Or it's an issue with the computer connection?? Check and come back next week!
+
+- Indra

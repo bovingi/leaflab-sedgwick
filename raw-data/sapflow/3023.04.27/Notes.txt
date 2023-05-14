@@ -1,0 +1,10 @@
+I am attempting to get the CR1000s communicating with the computer again, but not great luck. 
+
+Switching Hobbiton from CR1000X_E to CR1000X_D. Not sure if settings will need to be reentered though...?
+
+Okay! Figured out the issue!! We have all of our data!!! 
+
+Sometimes you need to reset the USB Port by clicking "Edit Datalogger Setup" and reselecting the proper COM port. Then everything will work as expected. Yay!
+
+So, downloaded Weathertop (to CambelSci/PC400/CR1000X_CSap_Flow_Data, appended to that file). Also downloaded from The top top weathertop spot (to CR1000X_A).Looks like there might be a data collection issue with this file (showing all NANs in 'Monitor Data' tab, but not sure why as all connections seem sound and no breaks in the wire. Going to look at all of the data collected so far and try to figure it out
+
