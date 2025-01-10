@@ -1,0 +1,348 @@
+Site,Plot,plot.number,Species,Tag,Date,pd_md,year,water_potential_mpa,Notes,Flag
+Lisque,Hobbiton,,Blue,2009,2024-04-12,pd,0,0.31,,branchlet
+Lisque,Hobbiton,,Blue,2009,2024-04-12,pd,0,0.23,,branchlet
+Lisque,Hobbiton,,Blue,2009,2024-04-12,pd,0,0.25,,branchlet
+Lisque,Hobbiton,,Live,2301,2024-04-12,pd,1,0.25,,
+Lisque,Hobbiton,,Live,2301,2024-04-12,pd,1,0.1,,
+Lisque,Hobbiton,,Live,2301,2024-04-12,pd,0,0.23,,branchlet
+Lisque,Hobbiton,,Live,2301,2024-04-12,pd,0,0.32,,branchlet
+Lisque,Hobbiton,,Live,2301,2024-04-12,pd,0,0.3,,branchlet
+Lisque,Hobbiton,,Live,2301,2024-04-12,pd,0,0.4,,branchlet
+Lisque,Hobbiton,,Live,2331,2024-04-12,pd,1,0.15,,
+Lisque,Hobbiton,,Live,2331,2024-04-12,pd,1,0.21,,
+Lisque,Hobbiton,,Live,2331,2024-04-12,pd,1,0.25,,
+Lisque,Hobbiton,,Live,2331,2024-04-12,pd,0,0.15,,branchlet
+Lisque,Hobbiton,,Live,2331,2024-04-12,pd,0,0.25,,branchlet
+Lisque,Hobbiton,,Live,2331,2024-04-12,pd,0,0.33,,branchlet
+Lisque,Hobbiton,,Blue,2343,2024-04-12,pd,0,0.3,,branchlet
+Lisque,Hobbiton,,Blue,2343,2024-04-12,pd,0,0.31,,branchlet
+Lisque,Hobbiton,,Blue,2343,2024-04-12,pd,0,0.29,,branchlet
+Lisque,Hobbiton,,Live,2345,2024-04-12,pd,1,0.08,,
+Lisque,Hobbiton,,Live,2345,2024-04-12,pd,1,0.19,,
+Lisque,Hobbiton,,Live,2345,2024-04-12,pd,0,0.16,,branchlet
+Lisque,Hobbiton,,Live,2345,2024-04-12,pd,0,0.25,,branchlet
+Lisque,Hobbiton,,Live,2345,2024-04-12,pd,0,0.25,,branchlet
+Lisque,Hobbiton,,Live,2345,2024-04-12,pd,0,0.21,,branchlet
+Lisque,Hobbiton,,Blue,2346,2024-04-12,pd,0,0.3,,branchlet
+Lisque,Hobbiton,,Blue,2346,2024-04-12,pd,0,0.36,,branchlet
+Lisque,Hobbiton,,Blue,2346,2024-04-12,pd,0,0.36,,branchlet
+Lisque,Hobbiton,,Blue,2347,2024-04-12,pd,0,0.32,,branchlet
+Lisque,Hobbiton,,Blue,2347,2024-04-12,pd,0,0.33,,branchlet
+Lisque,Hobbiton,,Blue,2370,2024-04-12,pd,0,0.4,,branchlet
+Lisque,Hobbiton,,Blue,2370,2024-04-12,pd,0,0.3,,branchlet
+Lisque,Hobbiton,,Blue,2370,2024-04-12,pd,0,0.45,,branchlet
+Lisque,Hobbiton,,Blue,2371,2024-04-12,pd,0,0.27,,branchlet
+Lisque,Hobbiton,,Blue,2371,2024-04-12,pd,0,0.45,,branchlet
+Lisque,Hobbiton,,Blue,2371,2024-04-12,pd,0,0.26,,branchlet
+Lisque,Hobbiton,,Blue,2372,2024-04-12,pd,0,0.37,,branchlet
+Lisque,Hobbiton,,Blue,2372,2024-04-12,pd,0,0.35,,branchlet
+Lisque,Hobbiton,,Blue,2372,2024-04-12,pd,0,0.39,,branchlet
+Lisque,Hobbiton,,Blue,2372,2024-04-12,pd,0,0.41,,branchlet
+Lisque,Hobbiton,,Blue,2375,2024-04-12,pd,0,0.18,,branchlet
+Lisque,Hobbiton,,Blue,2375,2024-04-12,pd,0,0.28,,branchlet
+Lisque,Hobbiton,,Blue,2375,2024-04-12,pd,0,0.25,,branchlet
+Lisque,Middle Earth,,Live,2352,2024-04-12,pd,1,0.08,,
+Lisque,Middle Earth,,Live,2352,2024-04-12,pd,1,0.07,,
+Lisque,Middle Earth,,Live,2352,2024-04-12,pd,0,0.38,,branchlet
+Lisque,Middle Earth,,Live,2352,2024-04-12,pd,0,0.35,,branchlet
+Lisque,Middle Earth,,Live,2354,2024-04-12,pd,1,0.16,,
+Lisque,Middle Earth,,Live,2354,2024-04-12,pd,1,0.13,,
+Lisque,Middle Earth,,Live,2354,2024-04-12,pd,1,0.12,,
+Lisque,Middle Earth,,Live,2354,2024-04-12,pd,0,0.36,,branchlet
+Lisque,Middle Earth,,Live,2354,2024-04-12,pd,0,0.49,,branchlet
+Lisque,Middle Earth,,Live,2354,2024-04-12,pd,0,0.37,,branchlet
+Lisque,Middle Earth,,Live,2354,2024-04-12,pd,0,0.49,,branchlet
+Lisque,Middle Earth,,Blue,2360,2024-04-12,pd,0,0.2,,branchlet
+Lisque,Middle Earth,,Blue,2360,2024-04-12,pd,0,0.21,,branchlet
+Lisque,Middle Earth,,Blue,2360,2024-04-12,pd,0,0.23,,branchlet
+Lisque,Middle Earth,,Blue,2360,2024-04-12,pd,0,0.25,,branchlet
+Lisque,Middle Earth,,Blue,2365,2024-04-12,pd,0,0.36,,branchlet
+Lisque,Middle Earth,,Blue,2365,2024-04-12,pd,0,0.37,,branchlet
+Lisque,Middle Earth,,Blue,2365,2024-04-12,pd,0,0.51,,branchlet
+Lisque,Middle Earth,,Blue,2365,2024-04-12,pd,0,0.55,,branchlet
+Lisque,Middle Earth,,Blue,2365,2024-04-12,pd,0,0.4,,branchlet
+Lisque,Middle Earth,,Blue,2367,2024-04-12,pd,0,0.85,,branchlet
+Lisque,Middle Earth,,Blue,2367,2024-04-12,pd,0,0.75,,branchlet
+Lisque,Middle Earth,,Blue,2367,2024-04-12,pd,0,0.55,,branchlet
+Lisque,Middle Earth,,Blue,2367,2024-04-12,pd,0,0.55,,branchlet
+Lisque,Middle Earth,,Blue,2367,2024-04-12,pd,0,0.52,,branchlet
+Lisque,Middle Earth,,Blue,2367,2024-04-12,pd,0,0.79,,branchlet
+Lisque,Middle Earth,,Blue,2369,2024-04-12,pd,0,0.44,,branchlet
+Lisque,Middle Earth,,Blue,2369,2024-04-12,pd,0,0.59,,branchlet
+Lisque,Middle Earth,,Blue,2369,2024-04-12,pd,0,0.49,,branchlet
+Lisque,Middle Earth,,Blue,2369,2024-04-12,pd,0,0.73,,branchlet
+Lisque,Middle Earth,,Live,2376,2024-04-12,pd,1,0.23,,
+Lisque,Middle Earth,,Live,2376,2024-04-12,pd,1,0.08,,
+Lisque,Middle Earth,,Live,2376,2024-04-12,pd,1,0.09,,
+Lisque,Middle Earth,,Live,2376,2024-04-12,pd,0,0.22,,branchlet
+Lisque,Middle Earth,,Live,2376,2024-04-12,pd,0,0.31,,branchlet
+Lisque,Middle Earth,,Live,2376,2024-04-12,pd,0,0.45,,branchlet
+Lisque,Middle Earth,,Live,2376,2024-04-12,pd,0,0.3,,branchlet
+Lisque,Rohan,,Live,2377,2024-04-12,pd,1,0.08,,
+Lisque,Rohan,,Live,2377,2024-04-12,pd,1,0.1,,
+Lisque,Rohan,,Live,2377,2024-04-12,pd,1,0.08,,
+Lisque,Rohan,,Live,2377,2024-04-12,pd,0,0.2,,branchlet
+Lisque,Rohan,,Live,2377,2024-04-12,pd,0,0.25,,branchlet
+Lisque,Rohan,,Live,2377,2024-04-12,pd,0,0.28,,branchlet
+Lisque,Rohan,,Blue,2378,2024-04-12,pd,0,0.14,,branchlet
+Lisque,Rohan,,Blue,2378,2024-04-12,pd,0,0.15,,branchlet
+Lisque,Rohan,,Blue,2378,2024-04-12,pd,0,0.17,,branchlet
+Lisque,Rohan,,Blue,2378,2024-04-12,pd,0,0.15,,branchlet
+Lisque,Rohan,,Blue,2379,2024-04-12,pd,0,0.08,,branchlet
+Lisque,Rohan,,Blue,2379,2024-04-12,pd,0,0.18,,branchlet
+Lisque,Rohan,,Blue,2379,2024-04-12,pd,0,0.08,,branchlet
+Lisque,Rohan,,Blue,2379,2024-04-12,pd,0,0.11,,branchlet
+Lisque,Rohan,,Blue,2379,2024-04-12,pd,0,0.14,,branchlet
+Lisque,Rohan,,Live,2380,2024-04-12,pd,1,0.08,,
+Lisque,Rohan,,Live,2380,2024-04-12,pd,1,0.07,,
+Lisque,Rohan,,Live,2380,2024-04-12,pd,1,0.05,,
+Lisque,Rohan,,Live,2380,2024-04-12,pd,0,0.2,,branchlet
+Lisque,Rohan,,Live,2380,2024-04-12,pd,0,0.2,,branchlet
+Lisque,Rohan,,Live,2380,2024-04-12,pd,0,0.25,,branchlet
+Lisque,Rohan,,ARCA,ART LL,2024-04-12,pd,0,0.35,,branchlet
+Lisque,Rohan,,ARCA,ART LL,2024-04-12,pd,0,0.27,,branchlet
+Lisque,Rohan,,ARCA,ART LL,2024-04-12,pd,0,0.4,,branchlet
+Lisque,Rohan,,ARCA,ART LL,2024-04-12,pd,0,0.35,,branchlet
+Lisque,Rohan,,SALE,LEU LL,2024-04-12,pd,0,0.15,,branchlet
+Lisque,Rohan,,SALE,LEU LL,2024-04-12,pd,0,0.2,,branchlet
+Lisque,Rohan,,SALE,LEU LL,2024-04-12,pd,0,0.16,,branchlet
+Lisque,Weathertop,,Blue,2010,2024-04-12,pd,0,0.27,,branchlet
+Lisque,Weathertop,,Blue,2010,2024-04-12,pd,0,0.19,,branchlet
+Lisque,Weathertop,,Blue,2010,2024-04-12,pd,0,0.24,,branchlet
+Lisque,Weathertop,,Blue,2010,2024-04-12,pd,0,0.23,,branchlet
+Lisque,Weathertop,,Blue,2010,2024-04-12,pd,0,0.2,,branchlet
+Lisque,Weathertop,,Blue,2011,2024-04-12,pd,0,0.14,,branchlet
+Lisque,Weathertop,,Blue,2011,2024-04-12,pd,0,0.11,,branchlet
+Lisque,Weathertop,,Blue,2011,2024-04-12,pd,0,0.12,,branchlet
+Lisque,Weathertop,,Blue,2381,2024-04-12,pd,0,0.43,,branchlet
+Lisque,Weathertop,,Blue,2381,2024-04-12,pd,0,0.35,,branchlet
+Lisque,Weathertop,,Blue,2381,2024-04-12,pd,0,0.32,,branchlet
+Lisque,Weathertop,,Blue,2381,2024-04-12,pd,0,0.36,,branchlet
+Lisque,Weathertop,,Blue,2382,2024-04-12,pd,0,0.1,,branchlet
+Lisque,Weathertop,,Blue,2382,2024-04-12,pd,0,0.16,,branchlet
+Lisque,Weathertop,,Blue,2382,2024-04-12,pd,0,0.15,,branchlet
+Lisque,Weathertop,,Blue,2383,2024-04-12,pd,0,0.27,,branchlet
+Lisque,Weathertop,,Blue,2383,2024-04-12,pd,0,0.2,,branchlet
+Lisque,Weathertop,,Blue,2383,2024-04-12,pd,0,0.27,,branchlet
+Lisque,Weathertop,,Blue,2384,2024-04-12,pd,0,0.1,,branchlet
+Lisque,Weathertop,,Blue,2384,2024-04-12,pd,0,0.15,,branchlet
+Lisque,Weathertop,,Blue,2384,2024-04-12,pd,0,0.2,,branchlet
+Lisque,Weathertop,,Blue,2384,2024-04-12,pd,0,0.23,,branchlet
+Cucu Mesa,Low,,Blue,1478,2024-04-12,pd,0,0.5,,branchlet
+Cucu Mesa,Low,,Blue,1478,2024-04-12,pd,0,0.6,,branchlet
+Cucu Mesa,High,,Blue,2004,2024-04-12,pd,0,0.4,,branchlet
+Cucu Mesa,High,,Blue,2004,2024-04-12,pd,0,0.42,,branchlet
+Cucu Mesa,High,,Blue,2004,2024-04-12,pd,0,0.45,,branchlet
+Cucu Mesa,High,,Blue,2005,2024-04-12,pd,0,0.35,,branchlet
+Cucu Mesa,High,,Blue,2005,2024-04-12,pd,0,0.3,,branchlet
+Cucu Mesa,High,,Blue,2005,2024-04-12,pd,0,0.4,,branchlet
+Cucu Mesa,High,,Blue,2006,2024-04-12,pd,0,0.4,,branchlet
+Cucu Mesa,High,,Blue,2006,2024-04-12,pd,0,0.45,,branchlet
+Cucu Mesa,High,,Blue,2006,2024-04-12,pd,0,0.5,,branchlet
+Cucu Mesa,High,,Blue,2006,2024-04-12,pd,0,0.4,,branchlet
+Cucu Mesa,High,,Blue,2007,2024-04-12,pd,0,0.15,,branchlet
+Cucu Mesa,High,,Blue,2007,2024-04-12,pd,0,0.27,,branchlet
+Cucu Mesa,High,,Blue,2007,2024-04-12,pd,0,0.21,,branchlet
+Cucu Mesa,High,,Blue,2007,2024-04-12,pd,0,0.22,,branchlet
+Cucu Mesa,High,,Blue,2008,2024-04-12,pd,0,0.52,,branchlet
+Cucu Mesa,High,,Blue,2008,2024-04-12,pd,0,0.32,,branchlet
+Cucu Mesa,High,,Blue,2008,2024-04-12,pd,0,0.51,,branchlet
+Cucu Mesa,High,,Blue,2008,2024-04-12,pd,0,0.5,,branchlet
+Cucu Mesa,Low,,Blue,2012,2024-04-12,pd,0,0.38,,branchlet
+Cucu Mesa,Low,,Blue,2012,2024-04-12,pd,0,0.36,,branchlet
+Cucu Mesa,Low,,Blue,2012,2024-04-12,pd,0,0.41,,branchlet
+Cucu Mesa,Low,,Blue,2013,2024-04-12,pd,0,0.18,,branchlet
+Cucu Mesa,Low,,Blue,2013,2024-04-12,pd,0,0.31,,branchlet
+Cucu Mesa,Low,,Blue,2013,2024-04-12,pd,0,0.25,,branchlet
+Cucu Mesa,Low,,Blue,2013,2024-04-12,pd,0,0.14,,branchlet
+Cucu Mesa,Low,,Blue,2015,2024-04-12,pd,0,0.46,,branchlet
+Cucu Mesa,Low,,Blue,2015,2024-04-12,pd,0,0.33,,branchlet
+Cucu Mesa,Low,,Blue,2015,2024-04-12,pd,0,0.32,,branchlet
+Cucu Mesa,Low,,Blue,2015,2024-04-12,pd,0,0.25,,branchlet
+Cucu Mesa,Low,,Blue,2016,2024-04-12,pd,0,0.35,,branchlet
+Cucu Mesa,Low,,Blue,2016,2024-04-12,pd,0,0.41,,branchlet
+Cucu Mesa,Low,,Blue,2016,2024-04-12,pd,0,0.35,,branchlet
+Cucu Mesa,Low,,Blue,2016,2024-04-12,pd,0,0.36,,branchlet
+Cucu Mesa,Low,,Blue,2016,2024-04-12,pd,0,0.75,,branchlet
+Cucu Mesa,High,,ARCA,ART CuCu,2024-04-12,pd,0,0.52,,branchlet
+Cucu Mesa,High,,ARCA,ART CuCu,2024-04-12,pd,0,0.75,,branchlet
+Cucu Mesa,High,,ARCA,ART CuCu,2024-04-12,pd,0,0.61,,branchlet
+Cucu Mesa,High,,ARCA,ART CuCu,2024-04-12,pd,0,0.61,,branchlet
+Cucu Mesa,High,,ARCA,ART CuCu,2024-04-12,pd,0,0.72,,branchlet
+Cucu Mesa,High,,SALE,LEU CuCu,2024-04-12,pd,0,0.05,,branchlet
+Cucu Mesa,High,,SALE,LEU CuCu,2024-04-12,pd,0,0.25,,branchlet
+Cucu Mesa,High,,SALE,LEU CuCu,2024-04-12,pd,0,0.25,,branchlet
+Cucu Mesa,High,,SALE,LEU CuCu,2024-04-12,pd,0,0.31,,branchlet
+Cucu Mesa,High,,SALE,LEU CuCu,2024-04-12,pd,0,0.12,,branchlet
+Cucu Mesa,High,,SALE,LEU CuCu,2024-04-12,pd,0,0.31,,branchlet
+Chamise,Chamise,,Blue,2020,2024-04-12,pd,0,0.45,,
+Chamise,Chamise,,Blue,2020,2024-04-12,pd,0,0.67,,
+Chamise,Chamise,,Blue,2020,2024-04-12,pd,0,0.4,,
+Chamise,Chamise,,Blue,2020,2024-04-12,pd,0,0.55,,
+Chamise,Chamise,,Blue,2020,2024-04-12,pd,0,0.55,,
+Chamise,Chamise,,Blue,2021,2024-04-12,pd,0,0.35,,
+Chamise,Chamise,,Blue,2021,2024-04-12,pd,0,0.32,,
+Chamise,Chamise,,Blue,2021,2024-04-12,pd,0,0.275,,
+Chamise,Chamise,,Blue,2021,2024-04-12,pd,0,0.21,,
+Chamise,Chamise,,Live,2022,2024-04-12,pd,1,0.25,,
+Chamise,Chamise,,Live,2022,2024-04-12,pd,1,0.25,,
+Chamise,Chamise,,Live,2022,2024-04-12,pd,1,0.25,,
+Chamise,Chamise,,Live,2022,2024-04-12,pd,0,0.32,,
+Chamise,Chamise,,Live,2022,2024-04-12,pd,0,0.35,,
+Chamise,Chamise,,Live,2022,2024-04-12,pd,0,0.26,,
+Chamise,Chamise,,Live,2022,2024-04-12,pd,0,0.24,,
+Chamise,Chamise,,Live,2023,2024-04-12,pd,1,0.3,,
+Chamise,Chamise,,Live,2023,2024-04-12,pd,1,0.32,,
+Chamise,Chamise,,Live,2023,2024-04-12,pd,0,0.4,,
+Chamise,Chamise,,Live,2023,2024-04-12,pd,0,0.35,,
+Chamise,Chamise,,Live,2023,2024-04-12,pd,0,0.38,,
+Chamise,Chamise,,Blue,2024,2024-04-12,pd,0,0.55,,
+Chamise,Chamise,,Blue,2024,2024-04-12,pd,0,0.24,,
+Chamise,Chamise,,Blue,2024,2024-04-12,pd,0,0.65,,
+Chamise,Chamise,,Blue,2024,2024-04-12,pd,0,0.52,,
+Chamise,Chamise,,Blue,2024,2024-04-12,pd,0,0.55,,
+Chamise,Chamise,,Blue,2025,2024-04-12,pd,0,0.3,,
+Chamise,Chamise,,Blue,2025,2024-04-12,pd,0,0.34,,
+Chamise,Chamise,,Blue,2025,2024-04-12,pd,0,0.25,,
+Chamise,Chamise,,Blue,2025,2024-04-12,pd,0,0.31,,
+Chamise,Shedd,,Blue,2026,2024-04-12,pd,0,0.27,,
+Chamise,Shedd,,Blue,2026,2024-04-12,pd,0,0.3,,
+Chamise,Shedd,,Blue,2026,2024-04-12,pd,0,0.35,,
+Chamise,Shedd,,Blue,2026,2024-04-12,pd,0,0.31,,
+Chamise,Shedd,,Blue,2027,2024-04-12,pd,0,0.5,,
+Chamise,Shedd,,Blue,2027,2024-04-12,pd,0,0.6,,
+Chamise,Shedd,,Blue,2027,2024-04-12,pd,0,0.51,,
+Chamise,Shedd,,Blue,2027,2024-04-12,pd,0,0.55,,
+Chamise,Shedd,,Blue,2028,2024-04-12,pd,0,0.21,,
+Chamise,Shedd,,Blue,2028,2024-04-12,pd,0,0.32,,
+Chamise,Shedd,,Blue,2028,2024-04-12,pd,0,0.29,,
+Chamise,Shedd,,Blue,2028,2024-04-12,pd,0,0.35,,
+Chamise,Shedd,,Blue,2028,2024-04-12,pd,0,0.4,,
+Chamise,Shedd,,Blue,2028,2024-04-12,pd,0,0.38,,
+Chamise,Shedd,,Live,2029,2024-04-12,pd,1,0.25,,
+Chamise,Shedd,,Live,2029,2024-04-12,pd,1,0.3,,
+Chamise,Shedd,,Live,2029,2024-04-12,pd,1,0.42,,
+Chamise,Shedd,,Live,2029,2024-04-12,pd,1,0.38,,
+Chamise,Shedd,,Live,2029,2024-04-12,pd,1,0.31,,
+Chamise,Shedd,,Live,2029,2024-04-12,pd,0,0.42,,
+Chamise,Shedd,,Live,2029,2024-04-12,pd,0,0.421,,
+Chamise,Shedd,,Live,2029,2024-04-12,pd,0,0.35,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,1,0.15,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,1,0.35,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,1,0.13,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,1,0.27,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,1,0.15,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,0,0.15,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,0,0.32,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,0,0.32,,
+Chamise,Shedd,,Live,2030,2024-04-12,pd,0,0.35,,
+Chamise,Shedd,,Blue,2031,2024-04-12,pd,0,0.34,,
+Chamise,Shedd,,Blue,2031,2024-04-12,pd,0,0.325,,
+Chamise,Shedd,,Blue,2031,2024-04-12,pd,0,0.375,,
+Chamise,Shedd,,Blue,2031,2024-04-12,pd,0,0.3,,
+Pine Needle,Pine Needle,,Blue,2085,2024-04-12,pd,0,0.47,,branchlet
+Pine Needle,Pine Needle,,Blue,2085,2024-04-12,pd,0,0.6,,branchlet
+Pine Needle,Pine Needle,,Blue,2085,2024-04-12,pd,0,0.41,,branchlet
+Pine Needle,Pine Needle,,Blue,2085,2024-04-12,pd,0,0.52,,branchlet
+Pine Needle,Pine Needle,,Blue,2086,2024-04-12,pd,0,0.53,,branchlet
+Pine Needle,Pine Needle,,Blue,2086,2024-04-12,pd,0,0.7,,branchlet
+Pine Needle,Pine Needle,,Blue,2086,2024-04-12,pd,0,0.6,,branchlet
+Pine Needle,Pine Needle,,Blue,2086,2024-04-12,pd,0,0.6,,branchlet
+Pine Needle,Pine Needle,,Blue,2086,2024-04-12,pd,0,0.5,,branchlet
+Pine Needle,Pine Needle,,Blue,2087,2024-04-12,pd,0,0.42,,branchlet
+Pine Needle,Pine Needle,,Blue,2087,2024-04-12,pd,0,0.45,,branchlet
+Pine Needle,Pine Needle,,Blue,2087,2024-04-12,pd,0,0.41,,branchlet
+Pine Needle,Pine Needle,,Blue,2088,2024-04-12,pd,0,0.65,,branchlet
+Pine Needle,Pine Needle,,Blue,2088,2024-04-12,pd,0,0.68,,branchlet
+Pine Needle,Pine Needle,,Blue,2088,2024-04-12,pd,0,0.5,,branchlet
+Pine Needle,Pine Needle,,Blue,2088,2024-04-12,pd,0,0.42,,branchlet
+Pine Needle,Pine Needle,,Blue,2088,2024-04-12,pd,0,0.47,,branchlet
+Pine Needle,Pine Needle,,Blue,2088,2024-04-12,pd,0,0.52,,branchlet
+Pine Needle,Pine Needle,,Live,2089,2024-04-12,pd,1,0.15,,
+Pine Needle,Pine Needle,,Live,2089,2024-04-12,pd,1,0.325,,
+Pine Needle,Pine Needle,,Live,2089,2024-04-12,pd,1,0.25,,
+Pine Needle,Pine Needle,,Live,2089,2024-04-12,pd,0,0.375,,branchlet
+Pine Needle,Pine Needle,,Live,2089,2024-04-12,pd,0,0.275,,branchlet
+Pine Needle,Pine Needle,,Live,2089,2024-04-12,pd,0,0.3,,branchlet
+Pine Needle,Pine Needle,,Blue,2090,2024-04-12,pd,0,0.5,,branchlet
+Pine Needle,Pine Needle,,Blue,2090,2024-04-12,pd,0,0.525,,branchlet
+Pine Needle,Pine Needle,,Blue,2090,2024-04-12,pd,0,0.43,,branchlet
+Pine Needle,Pine Needle,,Blue,2090,2024-04-12,pd,0,0.55,,branchlet
+Pine Needle,Pine Needle,,Live,2091,2024-04-12,pd,1,0.25,,
+Pine Needle,Pine Needle,,Live,2091,2024-04-12,pd,1,0.27,,
+Pine Needle,Pine Needle,,Live,2091,2024-04-12,pd,1,0.21,,
+Pine Needle,Pine Needle,,Live,2091,2024-04-12,pd,1,0.15,,
+Pine Needle,Pine Needle,,Live,2091,2024-04-12,pd,0,0.51,,branchlet
+Pine Needle,Pine Needle,,Live,2091,2024-04-12,pd,0,0.55,,branchlet
+Pine Needle,Pine Needle,,Live,2091,2024-04-12,pd,0,0.6,,branchlet
+Pine Needle,Pine Needle,,Live,2091,2024-04-12,pd,0,0.51,,branchlet
+Pine Needle,Pine Needle,,Live,2092,2024-04-12,pd,1,0.42,,
+Pine Needle,Pine Needle,,Live,2092,2024-04-12,pd,1,0.275,,
+Pine Needle,Pine Needle,,Live,2092,2024-04-12,pd,1,0.25,,
+Pine Needle,Pine Needle,,Live,2092,2024-04-12,pd,1,0.3,,
+Pine Needle,Pine Needle,,Live,2092,2024-04-12,pd,0,0.525,,branchlet
+Pine Needle,Pine Needle,,Live,2092,2024-04-12,pd,0,0.32,,branchlet
+Pine Needle,Pine Needle,,Live,2092,2024-04-12,pd,0,0.55,,branchlet
+Pine Needle,Pine Needle,,Live,2092,2024-04-12,pd,0,0.45,,branchlet
+Pine Needle,Pine Needle,,Live,2093,2024-04-12,pd,0,0.4,,branchlet
+Pine Needle,Pine Needle,,Live,2093,2024-04-12,pd,0,0.45,,branchlet
+Pine Needle,Pine Needle,,Live,2093,2024-04-12,pd,0,0.525,,branchlet
+Pine Needle,Pine Needle,,Live,2093,2024-04-12,pd,1,0.175,,
+Pine Needle,Pine Needle,,Live,2093,2024-04-12,pd,1,0.275,,
+Pine Needle,Pine Needle,,Live,2093,2024-04-12,pd,1,0.45,,
+Pine Needle,Pine Needle,,Live,2093,2024-04-12,pd,1,0.35,,
+Serpentine,Serpentine,,Blue,2052,2024-04-12,pd,0,0.81,,
+Serpentine,Serpentine,,Blue,2052,2024-04-12,pd,0,0.85,,
+Serpentine,Serpentine,,Blue,2052,2024-04-12,pd,0,0.79,,
+Serpentine,Serpentine,,Blue,2048,2024-04-12,pd,0,0.54,,
+Serpentine,Serpentine,,Blue,2048,2024-04-12,pd,0,0.66,,
+Serpentine,Serpentine,,Blue,2048,2024-04-12,pd,0,1.02,,
+Serpentine,Serpentine,,Blue,2048,2024-04-12,pd,0,0.9,,
+Serpentine,Serpentine,,Blue,2048,2024-04-12,pd,0,0.92,,
+Serpentine,Serpentine,,Blue,2049,2024-04-12,pd,0,0.48,,
+Serpentine,Serpentine,,Blue,2049,2024-04-12,pd,0,0.84,,
+Serpentine,Serpentine,,Blue,2049,2024-04-12,pd,0,0.39,,
+Serpentine,Serpentine,,Blue,2049,2024-04-12,pd,0,0.72,,
+Serpentine,Serpentine,,Blue,2049,2024-04-12,pd,0,0.84,,
+Serpentine,Serpentine,,Blue,2040,2024-04-12,pd,0,0.47,,
+Serpentine,Serpentine,,Blue,2040,2024-04-12,pd,0,0.55,,
+Serpentine,Serpentine,,Blue,2040,2024-04-12,pd,0,0.4,,
+Serpentine,Serpentine,,Blue,2041,2024-04-12,pd,0,0.13,,
+Serpentine,Serpentine,,Blue,2041,2024-04-12,pd,0,0.12,,
+Serpentine,Serpentine,,Blue,2041,2024-04-12,pd,0,0.25,,
+Serpentine,Serpentine,,Blue,2041,2024-04-12,pd,0,0.45,,
+Serpentine,Serpentine,,Blue,2041,2024-04-12,pd,0,0.35,,
+Serpentine,Serpentine,,Blue,2050,2024-04-12,pd,0,0.597,,
+Serpentine,Serpentine,,Blue,2050,2024-04-12,pd,0,0.354,,
+Serpentine,Serpentine,,Blue,2050,2024-04-12,pd,0,0.142,,
+Serpentine,Serpentine,,Blue,2050,2024-04-12,pd,0,0.329,,
+Serpentine,Serpentine,,Blue,2050,2024-04-12,pd,0,0.247,,
+Serpentine,Serpentine,,Blue,2050,2024-04-12,pd,0,0.456,,
+Serpentine,Serpentine,,Blue,2043,2024-04-12,pd,0,0.442,,
+Serpentine,Serpentine,,Blue,2043,2024-04-12,pd,0,0.198,,
+Serpentine,Serpentine,,Blue,2043,2024-04-12,pd,0,0.172,,
+Serpentine,Serpentine,,Blue,2043,2024-04-12,pd,0,0.236,,
+Serpentine,Serpentine,,Blue,2046,2024-04-12,pd,0,0.712,,
+Serpentine,Serpentine,,Blue,2046,2024-04-12,pd,0,0.849,,
+Serpentine,Serpentine,,Blue,2046,2024-04-12,pd,0,0.849,,
+Serpentine,Serpentine,,Blue,2046,2024-04-12,pd,0,0.808,,
+Serpentine,Serpentine,,Blue,2046,2024-04-12,pd,0,0.698,,
+Serpentine,Serpentine,,Blue,2047,2024-04-12,pd,0,0.573,,
+Serpentine,Serpentine,,Blue,2047,2024-04-12,pd,0,0.678,,
+Serpentine,Serpentine,,Blue,2047,2024-04-12,pd,0,0.852,,
+Serpentine,Serpentine,,Blue,2047,2024-04-12,pd,0,0.637,,
+Serpentine,Serpentine,,Blue,2051,2024-04-12,pd,0,0.833,,
+Serpentine,Serpentine,,Blue,2051,2024-04-12,pd,0,0.821,,
+Serpentine,Serpentine,,Blue,2051,2024-04-12,pd,0,0.607,,
+Serpentine,Serpentine,,Blue,2051,2024-04-12,pd,0,0.91,,
+Serpentine,Serpentine,,Blue,2045,2024-04-12,pd,0,0.563,,
+Serpentine,Serpentine,,Blue,2045,2024-04-12,pd,0,0.54,,Weird
+Serpentine,Serpentine,,Blue,2045,2024-04-12,pd,0,0.867,,Weird
+Serpentine,Serpentine,,Blue,2045,2024-04-12,pd,0,0.435,,
+Serpentine,Serpentine,,Blue,2045,2024-04-12,pd,0,0.789,,
+Serpentine,Serpentine,,Blue,2045,2024-04-12,pd,0,0.547,,
+Serpentine,Serpentine,,Blue,2042,2024-04-12,pd,0,0.63,,
+Serpentine,Serpentine,,Blue,2042,2024-04-12,pd,0,0.71,,
+Serpentine,Serpentine,,Blue,2042,2024-04-12,pd,0,0.273,,
+Serpentine,Serpentine,,Blue,2042,2024-04-12,pd,0,0.655,,
+Serpentine,Serpentine,,Blue,2042,2024-04-12,pd,0,0.574,,

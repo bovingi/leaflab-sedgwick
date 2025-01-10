@@ -1,0 +1,191 @@
+---
+title: "Water Potentials"
+author: "Indra Boving"
+date: "2025-01-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(janitor)
+library(lubridate)
+```
+
+Read in data and combine: 
+```{r}
+#all 2022 and 2023 data combined, but let's just use the 2023 data because we kinda cleaned up the 2022 data already
+wp_2023 <- read_csv(here("raw-data", "water potentials", "2022_2023_alldates_wp.csv")) %>% 
+  clean_names() %>% 
+  mutate(year = year(ymd(date))) %>% 
+  filter(year == 2023) %>% 
+  mutate(tree = as.numeric(tag))
+
+wp_2022 <- read_csv(here("raw-data", "water potentials", "2022_2023_alldates_wp.csv")) %>% 
+  clean_names() %>% 
+  mutate(year = year(ymd(date))) %>% 
+  filter(year == 2022)%>% 
+  mutate(tree = as.numeric(tag))
+
+
+#this is partially cleaned from the SHIFT analysis
+# wp_2022 <- read_csv(here("raw-data", "water potentials", "2022_alldates_wp.csv")) %>% 
+#   clean_names() %>% 
+#   mutate(year = year(ymd(date))) %>% 
+#   select(-x1) %>% 
+#   rename("pd_md" = "time", 
+#          "water_potential_mpa" = "mpa")
+
+#2024 data all dates.
+wp_2024 <- bind_rows(read_csv(here("raw-data", "water potentials", "20240413_wp.csv")), 
+                     read_csv(here("raw-data", "water potentials", "20240530_wp.csv"))) %>% 
+  clean_names() %>% 
+  mutate(year = year(ymd(date))) 
+
+#combine and fill species and site info: 
+wp_all <- bind_rows(wp_2022, wp_2023, wp_2024) %>% 
+  select(-flag) %>% #nothing in this column
+  filter(tree > 1000) %>% #remove shrubs
+  filter(!(notes %in% c("measured 10/3 after weekend sitting not cold -- don't trust",
+                        "disregard, leaf in half",
+                        "broke",
+                        "leaf bottom broke",
+                        "overshot maybe",
+                        "overshot"
+                        ))) %>% 
+#Fix sites that are missing
+  mutate(site = case_when(
+    site %in% c("PineNeedle") ~ "Pine Needle", 
+    tree %in% c(2040:2053) ~ "Serpentine",
+    TRUE ~ as.character(site)
+  )) %>% 
+  mutate(tree = case_when(
+    tree %in% c(2060) ~ 2006,
+    tree %in% c(2015) ~ 2013,
+    tree %in% c(2879) ~ 2379,
+    tree %in% c(2389) ~ 2089,
+    tree %in% c(2084) ~ 2384,
+    tree %in% c(2032) ~ 2332,
+    notes %in% c("Tree ID may be 2331, leaves not dried before bombing") ~ 2331,
+    TRUE ~ as.numeric(tree)
+  )) %>% 
+#Fix species that are missing:
+    mutate(species = case_when(
+    tree %in% c(2040:2053,
+                2305:2309) ~ "blue oak",
+    tree %in% c(2380, 2377, 2376, 2354, 2353,2352, 2331,2301, 2092, 2091, 2093, 2089, 2023, 2022, 2029, 2030) ~ "live oak",
+    species %in% c(NA, "?") ~ "blue oak",
+    TRUE ~ as.character(species)
+  )) %>% 
+  mutate(site = case_when(
+    tree %in% c(2342, 2306, 2308,2335, 2358, 2356,2357, 2359, 2362, 2355, 2363, #AT001
+                2305, 2351, 2334,2350, 2333, 2332, #AT003
+                2330,  2336, 2340, 2339, 2341, 2338, 2337  #AT002
+                ) ~ "LL",
+    TRUE ~ as.character(site)
+  )) %>% 
+    mutate(plot = case_when(
+    tree %in% c(2342, 2306, 2308,2335, 2358, 2356,2357, 2359, 2362, 2355, 2363) ~ "MiddleEarth", #AT001
+    tree %in% c(2305, 2351, 2334,2350, 2333, 2332) ~ "Ridge", #AT003
+    tree %in% c(2330,  2336, 2340, 2339, 2341, 2338, 2337) ~ "Hobbiton",  #AT002
+    site %in% c("Serpentine") ~ "Serpentine",
+    TRUE ~ as.character(plot)
+  )) %>% 
+  group_by(tree) %>% 
+  fill(c(site, plot, species), .direction = "downup") %>% 
+  ungroup() %>% 
+  filter(!(tree %in% c(2127))) #no idea what this tree is
+```
+
+Look for outliers
+
+```{r}
+#just middays: 
+wp_all %>% 
+  filter(pd_md == "md", 
+         year %in% c(2022)) %>% 
+  ggplot(aes(y = water_potential_mpa, 
+             x = tree,
+             color = species)) +
+  geom_point() +
+  facet_wrap(~date, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 90))
+#LL looks OK
+```
+
+```{r}
+pressure_chamber_wp_df <- wp_all %>% 
+  group_by(tree, pd_md, date) %>% 
+  mutate(water_potential_mean = mean(water_potential_mpa, na.rm = T),
+         water_potential_sd = sd(water_potential_mpa, na.rm = T),
+         water_potential_n = n()) %>% 
+  ungroup() %>% 
+  mutate(time = case_when(
+    pd_md %in% c("md") ~ hms("12:00:00"),
+    pd_md %in% c("pd") ~ hms("06:00:00"),
+  ), 
+  organ = "leaf", 
+  canopy_position = case_when(
+    pd_md %in% c("md") ~ "top",
+    pd_md %in% c("pd") ~ "mid",
+  )) %>% 
+  rename(individual_id = tree, 
+         plot_id = plot) %>% 
+  select(individual_id, plot_id, date, time, organ, canopy_position, water_potential_mean, water_potential_sd, water_potential_n) %>% 
+  distinct()
+```
+
+#Plants tab: 
+
+```{r}
+dbh_data <- read_csv(here("raw-data", "tree info", "invent.csv"), skip = 5) %>% 
+  clean_names() %>% 
+  mutate(individual_id = as.numeric(tag)) %>% 
+  select(individual_id , dbh, tree_height_m) 
+
+
+plants_df <- wp_all %>% 
+  select(tree, site, plot, species) %>% 
+  distinct() %>% 
+  mutate(genus = "Quercus",
+         species_epithet = case_when(
+           species %in% c("blue oak") ~ "douglasii",
+           species %in% c("live oak") ~ "agrifolia"
+         ),
+         plot_treatment_id = "No treatment",
+         individual_treatment_id = "No treatment"
+         ) %>% 
+  rename(individual_id = tree,
+         plot_id = plot
+         ) %>% 
+  select(individual_id, plot_id, plot_treatment_id, individual_treatment_id, genus, species_epithet) %>% 
+  merge(dbh_data,
+        all.x = TRUE)
+```
+
+#Plot tab
+
+Need: plot_id, treatment_id (No treatment), Vegetation type, LAI, growth condition, aspect, terrian, soil texture, percent sand, percent sil, percent clay
+
+```{r, eval = F}
+plot_df <- wp_all %>% 
+  select(plot) %>% 
+  distinct() %>% 
+  mutate(aspect = case_when(
+    plot %in% c("Weathertop") ~ , 
+    plot %in% c("Hobbiton"),
+    plot %in% c("High"),
+    plot %in% c("Low"),
+    plot %in% c("Chamise"),
+    plot %in% c("Shedd"),
+    plot %in% c("MiddleEarth"),
+    plot %in% c("Ridge"),
+    plot %in% c("Serpentine"),
+    plot %in% c("Near Hobbiton"),
+    plot %in% c("Middle Earth"),
+    plot %in% c("Rohan"),
+    TRUE ~ as.character(NA)
+  ))
+```
+
