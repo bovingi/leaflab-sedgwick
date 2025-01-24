@@ -1,0 +1,372 @@
+---
+title: "Water Potentials"
+author: "Indra Boving"
+date: "2025-01-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(janitor)
+library(lubridate)
+```
+
+#Water potentials tab:
+Read in data and combine: 
+```{r}
+#all 2022 and 2023 data combined, but let's just use the 2023 data because we kinda cleaned up the 2022 data already
+wp_2023 <- read_csv(here("raw-data", "water potentials", "2022_2023_alldates_wp.csv")) %>% 
+  clean_names() %>% 
+  mutate(year = year(ymd(date))) %>% 
+  filter(year == 2023) %>% 
+  mutate(tree = as.numeric(tag))
+
+wp_2022_1 <- read_csv(here("raw-data", "water potentials", "2022_2023_alldates_wp.csv")) %>% 
+  clean_names() %>% 
+  mutate(year = year(ymd(date))) %>% 
+  filter(year == 2022)%>% 
+  mutate(tree = as.numeric(tag)) 
+  
+wp_2022_1 %>% #Serpentine trees trees from 2022-09-15 and 2022-09-16 have some trees with exactly the same water potential values; just use one date? (Use 2022-09-16, has more unique data)
+  filter(tree %in% c(2040:2053)) %>%
+  filter(date %in% c("2022-09-15", "2022-09-16")) %>% 
+  ggplot(aes(y = water_potential_mpa,
+             x = tree,
+             color = as.factor(date))) +
+  geom_point(alpha = .4) + 
+  facet_wrap(~pd_md)
+```
+
+
+```{r}
+wp_2022 <- wp_2022_1 %>% 
+  filter(!(tree %in% c(2040:2053) & date %in% c("2022-09-16"))) #remove dupes
+
+#this is partially cleaned from the SHIFT analysis
+# wp_2022 <- read_csv(here("raw-data", "water potentials", "2022_alldates_wp.csv")) %>% 
+#   clean_names() %>% 
+#   mutate(year = year(ymd(date))) %>% 
+#   select(-x1) %>% 
+#   rename("pd_md" = "time", 
+#          "water_potential_mpa" = "mpa")
+
+#2024 data all dates.
+wp_2024 <- bind_rows(read_csv(here("raw-data", "water potentials", "20240413_wp.csv")), 
+                     read_csv(here("raw-data", "water potentials", "20240530_wp.csv")),
+                     read_csv(here("raw-data", "water potentials", "20240903_wp.csv")),
+                     read_csv(here("raw-data", "water potentials", "20240905_wp.csv"))
+                     ) %>% 
+  clean_names() %>% 
+  mutate(year = year(ymd(date))) %>% 
+  mutate(water_potential_mpa = case_when(
+    water_potential_mpa %in% c(1903.000) ~ 1.903, #comma instead of point; fixed in google sheets!
+    water_potential_mpa %in% c(1467.000) ~ 1.467, #comma instead of point; fixed in google sheets!
+    water_potential_mpa %in% c(1421.000) ~ 1.421, #comma instead of point; fixed in google sheets!
+    TRUE ~ as.numeric(water_potential_mpa)
+  ))
+
+#combine and fill species and site info: 
+wp_2022_2023 <- bind_rows(wp_2022, wp_2023) 
+
+wp_all <- bind_rows(wp_2024, wp_2022_2023)  %>% 
+  mutate(tree = as.numeric(tag)) %>% 
+  select(-flag, -tag) %>% #nothing in this column
+  #filter(tree > 1000) %>% #remove shrubs
+  drop_na(tree) %>% #remove shrubs, they became NAs in the as.numeric tree call
+  filter(!(notes %in% c("measured 10/3 after weekend sitting not cold -- don't trust",
+                        "measured 10/3 after weekend sitting not cold",
+                        "leaf ripped, disregard?",
+                        "disregard, leaf in half",
+                        "broke",
+                        "leaf bottom broke",
+                        "leaf ripped on sides",
+                        "overshot maybe",
+                        "overshot",
+                        "leaf top broke",
+                        "weird maybe" #not sure if we should keep these? 
+                        ))) %>% 
+#Fix sites that are missing
+  mutate(site = case_when(
+    site %in% c("PineNeedle") ~ "Pine Needle", 
+    tree %in% c(2040:2053) ~ "Serpentine",
+    TRUE ~ as.character(site)
+  )) %>% 
+  mutate(tree = case_when(
+    tree %in% c(2060) ~ 2006,
+    tree %in% c(2015) ~ 2013,
+    tree %in% c(2879) ~ 2379,
+    tree %in% c(2389) ~ 2089,
+    tree %in% c(2084) ~ 2384,
+    tree %in% c(2032) ~ 2332,
+    notes %in% c("Tree ID may be 2331, leaves not dried before bombing") ~ 2331, 
+    TRUE ~ as.numeric(tree)
+  )) %>% 
+#Fix species that are missing:
+    mutate(species = case_when(
+    tree %in% c(2040:2053,
+                2305:2309) ~ "blue oak",
+    tree %in% c(2380, 2377, 2376, 2354, 2353,2352, 2331,2301, 2092, 2091, 2093, 2089, 2023, 2022, 2029, 2030, 2345) ~ "live oak",
+    species %in% c(NA, "?", "Blue") ~ "blue oak",
+    TRUE ~ as.character(species)
+  )) %>% 
+  mutate(site = case_when(
+    tree %in% c(2342, 2306, 2308,2335, 2358, 2356,2357, 2359, 2362, 2355, 2363, #AT001
+                2305, 2351, 2334,2350, 2333, 2332, #AT003
+                2330,  2336, 2340, 2339, 2341, 2338, 2337  #AT002
+                ) ~ "LL",
+    TRUE ~ as.character(site)
+  )) %>% 
+    mutate(plot = case_when(
+    tree %in% c(2342, 2306, 2308,2335, 2358, 2356,2357, 2359, 2362, 2355, 2363) ~ "Middle Earth", #AT001
+    tree %in% c(2305, 2351, 2334,2350, 2333, 2332, 2301) ~ "Ridge", #AT003
+    tree %in% c(2330,  2336, 2340, 2339, 2341, 2338, 2337) ~ "Hobbiton",  #AT002
+    site %in% c("Serpentine") ~ "Serpentine",
+    plot %in% c("MiddleEarth") ~ "Middle Earth", 
+    plot %in% c("Near Hobbiton") ~ "Ridge",
+    tree %in% c(2008) ~ "Low", 
+    tree %in% c(2370, 2371) ~ "Weathertop",
+    tree %in% c(2377, 2378, 2379, 2380) ~ "Rohan",
+    TRUE ~ as.character(plot)
+  )) %>% 
+  group_by(tree) %>% 
+  fill(c(site, plot, species), .direction = "downup") %>% 
+  ungroup() %>% 
+  drop_na(year) %>% 
+  mutate(month = month(date)) %>% 
+  filter(!(tree %in% c(2127))) %>% #no idea what this tree is
+  filter(!(tree %in% c(2042) & water_potential_mpa > 10)) %>% 
+  filter(!(tree %in% c(2010) & water_potential_mpa %in% c(6.331))) %>% #leaf snapped in half
+  filter(!(tree %in% c(2246) & water_potential_mpa %in% c(5.970))) %>% #comment says 'weird maybe'
+  filter(!(tree %in% c(1478) & water_potential_mpa %in% c(0.900) & date %in% c("2023-05-12"))) %>%
+  filter(!(tree %in% c(2372) & water_potential_mpa %in% c(0.328) & date %in% c("2023-04-14"))) %>% #midday less than pd, something is off
+  filter(!(tree %in% c(2345) & water_potential_mpa %in% c(0.337) & date %in% c("2023-04-14"))) %>% #midday less than pd, something is off
+  filter(!(tree %in% c(2085) & water_potential_mpa %in% c(0.550) & date %in% c("2023-04-14"))) %>% #midday less than pd, something is off
+  filter(!(tree %in% c(2023) & water_potential_mpa %in% c(0.3000) & date %in% c("2023-07-27"))) %>%
+  filter(!(tree %in% c(2027) & water_potential_mpa %in% c(2.784) & date %in% c("2023-09-29"))) %>%
+  filter(!(tree %in% c(2377) & water_potential_mpa > 2 & date %in% c("2024-05-30"))) #%>% #first and second flush acting really differently; just use new flush for now. 
+  # group_by(tree, date, pd_md) %>% 
+  #  mutate(water_potential_mean = mean(water_potential_mpa, na.rm = T),
+  #        water_potential_sd = sd(water_potential_mpa, na.rm = T),
+  #        water_potential_n = n())
+
+wp_nas0 <- wp_all %>% 
+  filter(is.na(water_potential_mpa))
+```
+
+Look for outliers:
+
+```{r}
+wp_wide <- wp_all %>% 
+  pivot_wider(names_from = c(pd_md),
+              values_from = c(water_potential_mpa), 
+              values_fn = function(x) mean(x, na.rm = TRUE)) %>% 
+  mutate(month = month(date)) %>% 
+  group_by(tree, month, year) %>% 
+  fill(c(pd, md), .direction = "downup")
+
+p <- wp_wide %>% 
+  ggplot(aes(y = md,
+             x = pd, 
+             color = species,
+             shape = as.factor(month),
+             label = as.factor(tree))) +
+  geom_point() +
+  facet_wrap(~year, scales = "free") +
+  geom_abline()
+
+ 
+plotly::ggplotly(p)
+```
+```{r}
+unique(wp_2024$date)
+```
+
+
+```{r}
+#just middays: 
+p <- wp_all %>% 
+  filter(#pd_md == "md", 
+         year %in% c(2022),
+         month == 3) %>% 
+  ggplot(aes(y = water_potential_mpa, 
+             x = as.factor(tree),
+             color = pd_md)) +
+  geom_point(alpha = .5) +
+  facet_wrap(~date*species, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 90))
+
+plotly::ggplotly(p)
+#LL looks OK
+```
+```{r}
+wp_all %>% 
+  ggplot(aes(y = water_potential_mean,
+             x = water_potential_sd,
+             color = pd_md, 
+             #shape = as.factor(water_potential_n)
+             )) +
+  geom_point() +
+  facet_wrap(~year)
+```
+
+```{r}
+pressure_chamber_wp_df0 <- wp_all %>% 
+  group_by(tree, pd_md, date) %>% 
+  mutate(water_potential_mean = mean(water_potential_mpa, na.rm = T),
+         water_potential_sd = sd(water_potential_mpa, na.rm = T),
+         water_potential_n = n()) %>% 
+  ungroup() %>% 
+  mutate(time = case_when(
+    pd_md %in% c("md") ~ ("12:00:00"),
+    pd_md %in% c("pd") ~ ("03:00:00"),
+  ), 
+  organ = "leaf", 
+  canopy_position = case_when(
+    pd_md %in% c("md") ~ "top",
+    pd_md %in% c("pd") ~ "mid",
+  )) %>% 
+  rename(individual_id = tree, 
+         plot_id = plot)
+
+wp_nas <- pressure_chamber_wp_df0 %>% 
+  filter(is.na(water_potential_mean))
+
+pressure_chamber_wp_df <- pressure_chamber_wp_df0 %>% 
+  select(individual_id, plot_id, date, time, organ, canopy_position, water_potential_mean, water_potential_sd, water_potential_n) %>% 
+  distinct() %>% 
+  mutate(date = format(date,"%Y%m%d"))
+
+write_csv(pressure_chamber_wp_df, here("processed-data", "psinet", "pressure_chamber_wp.csv"))
+
+unique(pressure_chamber_wp_df$date)
+```
+
+#Plants tab: 
+
+```{r}
+dbh_old <- read_csv(here("raw-data", "tree info", "invent.csv"), skip = 5) %>% 
+  clean_names() %>% 
+  mutate(individual_id = as.numeric(tag)) %>% 
+  select(individual_id , dbh, tree_height_m) 
+
+survey123_data <- read_csv(here("raw-data", "tree info", "survey_0.csv")) %>% 
+  clean_names() %>% 
+  mutate(individual_id = as.numeric(tree_id),
+         dbh_survey = tree_dbh_diameter_at_nail) %>% 
+  select(individual_id, dbh_survey) 
+
+dbh_df <- merge(dbh_old, survey123_data, by = c("individual_id"), all = T) %>% 
+  distinct() %>% 
+  group_by(individual_id) %>% 
+  fill(c(dbh, dbh_survey), .direction = "downup") %>% 
+  ungroup() %>% 
+  distinct() %>% 
+  rowwise() %>% 
+  mutate(dbh = mean(c(dbh, dbh_survey), na.rm = T)) %>% 
+  distinct() %>% 
+  select(individual_id, dbh, tree_height_m)
+
+
+plants_df0 <- wp_all %>% 
+  select(tree, site, plot, species) %>% 
+  distinct() %>% 
+  mutate(genus = "Quercus",
+         species_epithet = case_when(
+           species %in% c("blue oak") ~ "douglasii",
+           species %in% c("live oak") ~ "agrifolia"
+         ),
+         plot_treatment_id = "No treatment",
+         individual_treatment_id = "No treatment"
+         ) %>% 
+  rename(individual_id = tree,
+         plot_id = plot
+         ) %>% 
+  select(individual_id, plot_treatment_id, individual_treatment_id, genus, species_epithet) %>% 
+  merge(dbh_df,
+        all.x = TRUE) %>% 
+  distinct()
+
+dupe_ids <- plants_df0 %>% 
+  group_by(individual_id) %>% 
+     filter(n()>1)
+
+plants_df <- plants_df0 
+
+write_csv(plants_df, here("processed-data", 
+                          "psinet",
+                          "plants.csv"))
+
+#Add in LAI: 
+lai_df <- read_csv(here("raw-data", "lai", "LAI_final.csv")) %>% 
+  clean_names() %>% 
+  select(treestr, springlai, springstdev) %>% 
+  rename(individual_id = treestr) %>% 
+  mutate(individual_id = as.numeric(individual_id))
+
+plants_lai <- merge(plants_df, lai_df, by = c("individual_id"), all.x = T)
+
+write_csv(plants_lai, here("processed-data", 
+                          "psinet",
+                          "plants_lai.csv"))
+```
+
+
+#Sensor data
+
+```{r}
+#WP dates:
+wp_dates_df <- pressure_chamber_wp_df 
+
+wp_dates <- unique(wp_dates_df$date)
+wp_dates
+```
+
+
+```{r}
+met_df <- read_csv(here("raw-data", "sensor data", "sedgwick-data-all.csv"), show_col_types = F) %>% 
+  clean_names() %>% 
+  mutate(time_char = format(time, "%Y-%m-%d %H:%M:%S"),
+         date_time = lubridate::ymd_hms(time_char), 
+         date = format(date(date_time),"%Y%m%d"),
+         date_char = as.character(date),
+         time = format(date_time, "%H:%M:%S")) 
+
+met_df0 <- met_df %>%
+  filter(date_char %in% wp_dates) %>% 
+  filter(time %in% c("03:00:00", "12:00:00")) %>% #just predawn and middays%>% 
+  mutate(
+  elev = 400, #avg elevation in meters of trees
+  temp = sedgwick_air_temp_2_m_avg_deg_c,
+  relative_humidity = sedgwick_relative_humidity_avg_percent,
+  pa = bigleaf::pressure.from.elevation(
+  elev,
+  temp, #convert temp to C
+  VPD = NULL,
+  constants = bigleaf::bigleaf.constants())) %>% 
+  mutate(vpd_kpa = plantecophys::RHtoVPD(relative_humidity, temp, Pa = pa)) %>% 
+  select(date, 
+         time, 
+         sedgwick_rainfall_mm, #good
+         sedgwick_relative_humidity_avg_percent,
+         vpd_kpa,
+         sedgwick_air_temp_2_m_avg_deg_c,
+         sedgwick_photosynthetically_active_radiation_avg_mmol_m_2,
+         sedgwick_total_solar_radiation_avg_w_m_2,
+         sedgwick_wind_speed_avg_m_s
+         )
+
+#look at it to make sure not crazy:
+met_df0 %>% 
+  ggplot(aes(y =sedgwick_total_solar_radiation_avg_w_m_2,
+             x= date, 
+             color = time)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+
+write_csv(met_df0, here("processed-data", "psinet", "met_data.csv"))
+```
+
+
+
