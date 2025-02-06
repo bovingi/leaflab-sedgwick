@@ -1,0 +1,54 @@
+---
+title: "PV Curves"
+author: "Indra Boving"
+date: "2025-02-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+```
+
+Read in data:
+
+```{r}
+pv_df <- read_csv(here::here("raw-data", "pv_curves_long_rayna.csv")) %>% 
+  janitor::clean_names() %>% 
+  group_by(tree, date, rehydrated, pd_or_md) %>% 
+  fill(c(stem_dry_wt_g, 
+         leaves_dry_wt_g,
+         weigh_boat_mass_g,
+         gasket_mass_g,
+         parafilm_mass_g,
+         tape_mass_g,
+         other_non_stem_mass_g,
+         total_nonsample_wt,
+         leaf_area,
+         ), .direction = "down")
+```
+
+Rehydrated vs. non-rehydrated: 
+
+```{r}
+pv_df %>% 
+  drop_na(pd_or_md) %>% 
+  ggplot(aes(y = x1_mpa,
+         x = rwc,
+         color = rehydrated)) +
+  geom_point() +
+  facet_wrap(~pd_or_md)
+```
+
+
+```{r}
+pv_df %>% 
+  drop_na(pd_or_md) %>% 
+  ggplot(aes(y = tlp,
+         x = pd_or_md,
+         color = rehydrated)) +
+  geom_point() +
+  geom_boxplot(fill = NA)
+```
+
