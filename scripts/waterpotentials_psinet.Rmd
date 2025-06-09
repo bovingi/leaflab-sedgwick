@@ -322,7 +322,7 @@ wp_dates_df <- pressure_chamber_wp_df
 wp_dates <- unique(wp_dates_df$date)
 wp_dates
 ```
-
+Met data from here: https://dendra.science/orgs/ucnrs/status/sedgwick 
 
 ```{r}
 met_df <- read_csv(here("raw-data", "sensor data", "sedgwick-data-all.csv"), show_col_types = F) %>% 
@@ -334,7 +334,7 @@ met_df <- read_csv(here("raw-data", "sensor data", "sedgwick-data-all.csv"), sho
          time = format(date_time, "%H:%M:%S")) 
 
 met_df0 <- met_df %>%
-  filter(date_char %in% wp_dates) %>% 
+  filter(date_char %in% wp_dates) %>% #Just dates we used
   filter(time %in% c("03:00:00", "12:00:00")) %>% #just predawn and middays%>% 
   mutate(
   elev = 400, #avg elevation in meters of trees
@@ -360,12 +360,13 @@ met_df0 <- met_df %>%
 #look at it to make sure not crazy:
 met_df0 %>% 
   ggplot(aes(y =sedgwick_total_solar_radiation_avg_w_m_2,
-             x= date, 
-             color = time)) +
+             x= date)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90))
 
-write_csv(met_df0, here("processed-data", "psinet", "met_data.csv"))
+
+#write_csv(met_df0, here("processed-data", "psinet", "met_data_all.csv"))
+#write_csv(met_df0, here("processed-data", "psinet", "met_data_justpdmd.csv"))
 ```
 
 
