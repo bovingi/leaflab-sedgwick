@@ -200,15 +200,9 @@ p <- wp_all %>%
 plotly::ggplotly(p)
 #LL looks OK
 ```
+###For general use: 
 ```{r}
-wp_all %>% 
-  ggplot(aes(y = water_potential_mean,
-             x = water_potential_sd,
-             color = pd_md, 
-             #shape = as.factor(water_potential_n)
-             )) +
-  geom_point() +
-  facet_wrap(~year)
+write_csv(wp_all, here("processed-data", "wp_2022_2024.csv"))
 ```
 
 ```{r}

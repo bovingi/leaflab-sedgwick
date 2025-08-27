@@ -1,0 +1,44 @@
+---
+title: "Untitled"
+author: "Indra Boving"
+date: "2025-08-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(janitor)
+library(lubridate)
+```
+
+#Data wrangling: 
+
+2022-2024 data: 
+
+```{r}
+wp_2022_2024 <- read_csv(here("processed-data", "wp_2022_2024.csv"))
+```
+
+2025 data: 
+
+```{r}
+wp_2025_md <- read_csv(here("raw-data", "water potentials", "2025","20250715_middays.csv")) %>% 
+  mutate(pd_md = "md") %>% 
+  clean_names() %>% 
+  mutate(x3 = as.numeric(x3)) %>% 
+  mutate(collection_date = lubridate::mdy(collection_data))
+
+wp_2025_pd <- read_csv(here("raw-data", "water potentials", "2025", "20250715_predawns.csv")) %>% 
+  mutate(pd_md = "pd")%>% 
+  clean_names() %>% 
+  mutate(collection_date = lubridate::mdy(collection_date))
+
+wp_2025_all <- bind_rows(wp_2025_md, wp_2025_pd) %>% 
+  rename(tree_id = tred_id) %>% 
+  pivot_longer(cols = c(4:10), names_to = "rep", values_to = "water_potential_mpa") %>%
+  drop_na(water_potential_mpa) %>% 
+  select(-rep, -collection_data, -operator)
+```
+
