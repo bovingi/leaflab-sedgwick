@@ -214,6 +214,7 @@ wp_all %>%
 ```{r}
 pressure_chamber_wp_df0 <- wp_all %>% 
   group_by(tree, pd_md, date) %>% 
+  drop_na(water_potential_mpa) %>% 
   mutate(water_potential_mean = mean(water_potential_mpa, na.rm = T),
          water_potential_sd = sd(water_potential_mpa, na.rm = T),
          water_potential_n = n()) %>% 
@@ -232,7 +233,10 @@ pressure_chamber_wp_df0 <- wp_all %>%
 
 wp_nas <- pressure_chamber_wp_df0 %>% 
   filter(is.na(water_potential_mean))
+```
 
+####For PSINET:
+```{r}
 pressure_chamber_wp_df <- pressure_chamber_wp_df0 %>% 
   select(individual_id, plot_id, date, time, organ, canopy_position, water_potential_mean, water_potential_sd, water_potential_n) %>% 
   distinct() %>% 
@@ -241,6 +245,49 @@ pressure_chamber_wp_df <- pressure_chamber_wp_df0 %>%
 write_csv(pressure_chamber_wp_df, here("processed-data", "psinet", "pressure_chamber_wp.csv"))
 
 unique(pressure_chamber_wp_df$date)
+```
+
+####For ZENODO: 
+```{r}
+core_trees_latlong <- read_csv(here("raw-data", "tree info", "tree_locations.csv")) %>% 
+  clean_names() %>% 
+  mutate(individual_id = as.numeric(name)) %>% 
+    select(x, y, individual_id )  %>% 
+  rename(latitude = x, 
+         longitude = y)
+
+pipers_trees_latlong <- read_csv(here("raw-data", "tree info", "serpentine_tree_locations.csv")) %>% 
+  clean_names()%>% 
+  rename(latitude = xcoord, 
+         longitude = ycoord, 
+         individual_id = tree_id) %>% 
+  select(individual_id,latitude, longitude)
+
+trees_latlong <- bind_rows(pipers_trees_latlong, core_trees_latlong)
+  
+zenodo_wp_df <- pressure_chamber_wp_df0 %>% 
+  select(site,individual_id, species, plot_id, date, pd_md, water_potential_mean, water_potential_sd, water_potential_n) %>% 
+  distinct() %>% 
+  merge(trees_latlong, by = c("individual_id"), all.x = T) %>% 
+  mutate(date = format(date,"%Y%m%d")) %>% 
+  mutate(species = case_when( 
+    species %in% c("blue oak") ~ "Quercus douglasii",
+    species %in% c("live oak") ~ "Quercus agrifolia")) %>% 
+  #drop_na(water_potential_mean) %>% 
+  mutate(site = case_when(
+    site %in% c("LL") ~ "Lisque", 
+    TRUE ~ as.character(site))) %>% 
+  distinct() %>% 
+  mutate(coord_system = "EPSG:4326-WGS 84")
+
+write_csv(zenodo_wp_df, here("processed-data", "psinet", "zenodo_wp_df.csv"))
+
+locations_nas <- zenodo_wp_df %>% 
+  filter(is.na(latitude)) %>% 
+  select(individual_id, site, plot_id, latitude, longitude) %>% 
+  distinct()
+
+write_csv(locations_nas, here("processed-data", "psinet", "locations_nas.csv"))
 ```
 
 #Plants tab: 
