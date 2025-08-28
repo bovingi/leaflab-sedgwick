@@ -17,13 +17,13 @@ library(lubridate)
 Read in data and combine: 
 ```{r}
 #all 2022 and 2023 data combined, but let's just use the 2023 data because we kinda cleaned up the 2022 data already
-wp_2023 <- read_csv(here("raw-data", "water potentials", "2022_2023_alldates_wp.csv")) %>% 
+wp_2023 <- read_csv(here("raw-data", "water potentials", "2022and2023", "2022_2023_alldates_wp.csv")) %>% 
   clean_names() %>% 
   mutate(year = year(ymd(date))) %>% 
   filter(year == 2023) %>% 
   mutate(tree = as.numeric(tag))
 
-wp_2022_1 <- read_csv(here("raw-data", "water potentials", "2022_2023_alldates_wp.csv")) %>% 
+wp_2022_1 <- read_csv(here("raw-data", "water potentials",  "2022and2023","2022_2023_alldates_wp.csv")) %>% 
   clean_names() %>% 
   mutate(year = year(ymd(date))) %>% 
   filter(year == 2022)%>% 
@@ -53,10 +53,10 @@ wp_2022 <- wp_2022_1 %>%
 #          "water_potential_mpa" = "mpa")
 
 #2024 data all dates.
-wp_2024 <- bind_rows(read_csv(here("raw-data", "water potentials", "20240413_wp.csv")), 
-                     read_csv(here("raw-data", "water potentials", "20240530_wp.csv")),
-                     read_csv(here("raw-data", "water potentials", "20240903_wp.csv")),
-                     read_csv(here("raw-data", "water potentials", "20240905_wp.csv"))
+wp_2024 <- bind_rows(read_csv(here("raw-data", "water potentials", "2024", "20240413_wp.csv")), 
+                     read_csv(here("raw-data", "water potentials", "2024","20240530_wp.csv")),
+                     read_csv(here("raw-data", "water potentials", "2024","20240903_wp.csv")),
+                     read_csv(here("raw-data", "water potentials", "2024","20240905_wp.csv"))
                      ) %>% 
   clean_names() %>% 
   mutate(year = year(ymd(date))) %>% 
