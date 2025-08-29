@@ -1,0 +1,172 @@
+---
+title: "Untitled"
+author: "Indra Boving"
+date: "2025-08-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(janitor)
+library(lubridate)
+```
+
+#Data wrangling: 
+
+###Tree information: 
+
+- tree locations, species, and notes: 
+
+```{r}
+core_trees_latlong <- read_csv(here("raw-data", "tree info", "tree_locations.csv")) %>% 
+  clean_names() %>% 
+  mutate(individual_id = as.numeric(name)) %>% 
+    select(x, y, individual_id )  %>% 
+  rename(latitude = x, 
+         longitude = y)
+
+pipers_trees_latlong <- read_csv(here("raw-data", "tree info", "serpentine_tree_locations.csv")) %>% 
+  clean_names()%>% 
+  rename(latitude = xcoord, 
+         longitude = ycoord, 
+         individual_id = tree_id) %>% 
+  select(individual_id,latitude, longitude)
+
+othertrees_latlong <- read_csv(here("raw-data", "tree info", "MissingTreeLatLon_20250828.csv")) %>% 
+  clean_names() %>% 
+  mutate(individual_id = as.numeric(individual_id)) %>% 
+  select(individual_id,latitude, longitude)
+
+trees_latlong <- bind_rows(pipers_trees_latlong, 
+                           core_trees_latlong, 
+                           othertrees_latlong)
+```
+
+##Collected data: 
+
+2022-2024 data, wrangled in 'waterpotentials_psinet.Rmd' script and as part of SHIFT paper. 
+
+```{r}
+wp_2022_2024 <- read_csv(here("processed-data", "wp_2022_2024.csv"), show_col_types = FALSE)
+```
+
+2025 data: 
+
+- All wrangled here. 
+
+Notes: 
+
+- 20250829, only have first 2025 trip (June) data. 
+
+```{r}
+wp_2025_md <- read_csv(here("raw-data", "water potentials", "2025","20250715_middays.csv"),show_col_types = FALSE) %>% 
+  mutate(pd_md = "md") %>% 
+  clean_names() %>% 
+  mutate(x3 = as.numeric(x3)) %>% 
+  mutate(date = lubridate::mdy(collection_data))
+
+wp_2025_pd <- read_csv(here("raw-data", "water potentials", "2025", "20250715_predawns.csv"),show_col_types = FALSE) %>% 
+  mutate(pd_md = "pd")%>% 
+  clean_names() %>% 
+  mutate(date = lubridate::mdy(collection_date)) %>% 
+  rename(notes = note)
+
+wp_2025 <- bind_rows(wp_2025_md, wp_2025_pd) %>% 
+  rename(tree_id = tred_id) %>% 
+  pivot_longer(cols = c(4:10), names_to = "rep", values_to = "water_potential_mpa") %>%
+  drop_na(water_potential_mpa) %>% 
+  mutate(tree = as.numeric(tree_id)) %>% 
+  select(-rep, -collection_data, -operator, -collection_date, -tree_id) %>% 
+  mutate(month = lubridate::month(date), 
+         year = lubridate::year(date)) %>% 
+  mutate(tree = case_when( #trees mislabeled, probably
+    tree %in% c(2390) ~ 2090, 
+    tree %in% c(2391) ~ 2091, 
+    tree %in% c(2392) ~ 2092,
+    tree %in% c(2393) ~ 2093, 
+    tree %in% c(2394) ~ 2094, 
+    TRUE ~ as.numeric(tree)
+  )) %>% 
+  mutate(notes = case_when(
+    tree %in% c(2018, 2094, 2019) ~ "Not sure what trees these are", 
+    TRUE ~ as.character(notes)
+  )) %>% 
+  filter(tree > 1000) #remove Shane's trees
+```
+
+Combine 2025 and rest of data: 
+
+```{r}
+wp_all <- bind_rows(wp_2025, 
+                    wp_2022_2024) %>% 
+  drop_na(tree) %>% #remove shrubs for now
+  group_by(tree) %>% 
+  fill(c(site, plot, plot_number, species), .direction = "downup") 
+```
+
+#look for outliers: 
+```{r}
+wp_wide <-wp_all  %>% 
+  pivot_wider(names_from = c(pd_md),
+              values_from = c(water_potential_mpa), 
+              values_fn = function(x) mean(x, na.rm = TRUE)) %>% 
+  mutate(month = month(date)) %>% 
+  group_by(tree, month, year) %>% 
+  fill(c(pd, md), .direction = "downup")
+
+p <- wp_wide %>% 
+  ggplot(aes(y = md,
+             x = pd, 
+             color = species,
+             shape = as.factor(month),
+             label = as.factor(tree))) +
+  geom_point() +
+  facet_wrap(~year, scales = "free") +
+  geom_abline()
+
+ 
+plotly::ggplotly(p)
+```
+
+
+####For ZENODO: 
+```{r}
+zenodo_wp_df <- wp_all %>% 
+  group_by(tree, pd_md, date) %>% 
+  drop_na(water_potential_mpa) %>% 
+  mutate(water_potential_mean = mean(water_potential_mpa, na.rm = T),
+         water_potential_sd = sd(water_potential_mpa, na.rm = T),
+         water_potential_n = n()) %>% 
+  ungroup() %>% 
+  rename(individual_id = tree) %>% 
+  select(site,individual_id, species,
+         date, pd_md, water_potential_mean, 
+         water_potential_sd, water_potential_n) %>% 
+  distinct() %>% 
+  merge(trees_latlong, by = c("individual_id"), all.x = T) %>% 
+  mutate(date = format(date,"%Y%m%d")) %>% 
+  mutate(species = case_when( 
+    species %in% c("blue oak") ~ "Quercus douglasii",
+    species %in% c("live oak") ~ "Quercus agrifolia")) %>% 
+  #drop_na(water_potential_mean) %>% 
+  mutate(site = case_when(
+    site %in% c("LL") ~ "Lisque", 
+    TRUE ~ as.character(site))) %>% 
+  distinct() %>% 
+  mutate(coord_system = "EPSG:4326-WGS 84")
+
+#Write out csv here. Change date if needed! 
+write_csv(zenodo_wp_df, here("processed-data", "sedgwick_mpas_allyears_20250829.csv"))
+
+# locations_nas <- zenodo_wp_df %>% 
+#   filter(is.na(latitude)) %>% 
+#   select(individual_id, site,latitude, longitude) %>% 
+#   distinct()
+# 
+# write_csv(locations_nas, here("processed-data", "psinet", "locations_nas.csv"))
+```
+
+
+
