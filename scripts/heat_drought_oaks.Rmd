@@ -96,3 +96,57 @@ ggplot(extreme_trees_by_species,
         strip.text = element_text(face = "bold"))
 ```
 
+Just 2022:
+
+```{r}
+# 1) Filter to predawn only, Aug–Sep, add year, and keep only trees with ≥3 years of measurements 
+df2 <- wp_allyears %>% 
+  mutate(year = substr(as.character(date), 1, 4)) %>% 
+  filter(pd_md == "pd",
+         month %in% 8:9,
+         year == 2022)
+
+# 2) Mean WP per tree *per year* (keep species)
+tree_year <- df2 %>%
+  group_by(individual_id, species, site) %>%
+  summarise(mean_wp = mean(water_potential_mean, na.rm = TRUE),
+            .groups = "drop")
+
+# 4) Bottom/Top 10 *within each species*
+lowest10_by_species <- tree_year %>%
+  group_by(species) %>%
+  slice_min(mean_wp, n = 10, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(rank = "Lowest 10")
+
+highest10_by_species <- tree_year %>%
+  group_by(species) %>%
+  slice_max(mean_wp, n = 10, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(rank = "Highest 10")
+
+
+extreme_trees_by_species <- bind_rows(lowest10_by_species, highest10_by_species)
+
+# --- Visualization ---
+
+# Label that’s unique across species (for ordering) but shows ID clearly
+extreme_trees_by_species <- extreme_trees_by_species %>%
+  mutate(tree_lab = paste0(species, " • ", individual_id),
+         tree_lab = fct_reorder(tree_lab, mean_wp))
+
+# Bars: top/bottom 10 per species (faceted)
+ggplot(extreme_trees_by_species,
+       aes(x = tree_lab, y = mean_wp, fill = rank)) +
+  geom_col(color = "black") +
+  coord_flip() +
+  facet_wrap(~ species + rank, scales = "free_y") +
+  labs(x = "Tree (species • ID)",
+       y = "Mean Predawn Water Potential (MPa)",
+       title = "Driest and Wettest 10 Trees per Species", 
+       subtitle = "(Mean PDs for measurements taken Aug–Sep over from 2022 years)") +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none",
+        strip.text = element_text(face = "bold"))
+```
+
