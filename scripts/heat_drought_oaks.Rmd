@@ -15,8 +15,8 @@ library(janitor)
 library(lubridate)
 
 #remove everything (except stored functions) from global environment so that we can start fresh. 
-rm(list = names(which(!unlist(eapply(.GlobalEnv, 
-    \(x) inherits(x, what = "function"))))))
+#rm(list = names(which(!unlist(eapply(.GlobalEnv, 
+    #\(x) inherits(x, what = "function"))))))
 ```
 
 #Data: 
