@@ -1,0 +1,152 @@
+---
+title: "Code for Thermal Tolerance and Water Use Strategies in Oaks "
+author: "Indra Boving"
+date: "2025-08-29"
+output: html_document
+---
+
+Project Abstract: This study investigates the coordination between leaf heat tolerance and water source use in two California oak species at Sedgwick Reserve: Quercus douglasii (blue oak) and Quercus agrifolia (coast live oak). From previous studies at Sedgwick Reserve, oaks predicted to be the least drought stressed have been the most drought stressed while the oaks predicted to be the most drought stressed have been the least drought stressed. This project aims to shed some light on this issue. This study will work in conjunction with the “Long Term Water Stress Monitoring of Oaks” project conducted by Dr. Lee Anderegg. Four already established sites from the aforementioned study at Sedgwick Reserve will be used for sampling. Using chlorophyll fluorescence imaging, we will measure Tcrit, the critical temperature at which photosystem II becomes thermally unstable. Simultaneously, we will analyze stable water isotopes in stem water to infer whether trees are accessing shallow or deep water sources during summer heat. From these analyses, we will attempt to find a correlation between oak thermal tolerance and water source. By linking thermal performance with hydrological strategies, this project aims to understand how species and individuals cope with combined heat and drought stress at Sedgwick Reserve. Results will provide insight into trait coordination and resilience mechanisms. California oaks are foundation species facing increasing stress from rising temperatures, prolonged drought, and climate-driven shifts in water availability. However, we still lack a mechanistic understanding of how heat tolerance and water use strategies co-vary within and between species. This study provides an integrative approach to identify traits associated with resilience, information that is important for predicting vegetation responses to climate change, informing conservation efforts, and guiding management in drought-prone landscapes. 
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(janitor)
+library(lubridate)
+
+#remove everything (except stored functions) from global environment so that we can start fresh. 
+#rm(list = names(which(!unlist(eapply(.GlobalEnv, 
+    #\(x) inherits(x, what = "function"))))))
+```
+
+#Data: 
+
+```{r}
+wp_allyears <- read_csv(here("processed-data", 
+                             "sedgwick_mpas_allyears_20250829.csv"),
+                        show_col_types = FALSE) %>% 
+  mutate(date = ymd(date), 
+         month = month(date))
+```
+
+###Initial analysis: 
+
+- What trees are the wettest and driest? 
+
+```{r}
+# 1) Filter to predawn only, Aug–Sep, add year, and keep only trees with ≥3 years of measurements 
+df2 <- wp_allyears %>% 
+  filter(pd_md == "pd",
+         month %in% 8:9) %>% 
+  mutate(year = substr(as.character(date), 1, 4)) %>%
+  group_by(individual_id) %>%
+  mutate(n_years = n_distinct(year)) %>%
+  ungroup() %>%
+  filter(n_years >= 3)
+
+# 2) Mean WP per tree *per year* (keep species)
+tree_year <- df2 %>%
+  group_by(individual_id, species, site, year) %>%
+  summarise(mean_wp_year = mean(water_potential_mean, na.rm = TRUE),
+            .groups = "drop")
+
+# 3) Collapse to one mean per tree across years (still species-aware)
+tree_overall <- tree_year %>%
+  group_by(individual_id, species, site) %>%
+  summarise(mean_wp = mean(mean_wp_year, na.rm = TRUE),
+            n_years = n_distinct(year),
+            .groups = "drop") %>%
+  # safety: keep the ≥3-year requirement after the re-summarise
+  filter(n_years >= 3)
+
+# 4) Bottom/Top 10 *within each species*
+lowest10_by_species <- tree_overall %>%
+  group_by(species) %>%
+  slice_min(mean_wp, n = 10, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(rank = "Lowest 10")
+
+highest10_by_species <- tree_overall %>%
+  group_by(species) %>%
+  slice_max(mean_wp, n = 10, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(rank = "Highest 10")
+
+extreme_trees_by_species <- bind_rows(lowest10_by_species, highest10_by_species)
+
+# --- Visualization ---
+
+# Label that’s unique across species (for ordering) but shows ID clearly
+extreme_trees_by_species <- extreme_trees_by_species %>%
+  mutate(tree_lab = paste0(species, " • ", individual_id),
+         tree_lab = fct_reorder(tree_lab, mean_wp))
+
+# Bars: top/bottom 10 per species (faceted)
+ggplot(extreme_trees_by_species,
+       aes(x = tree_lab, y = mean_wp, fill = rank)) +
+  geom_col(color = "black") +
+  coord_flip() +
+  facet_wrap(~ species + rank, scales = "free_y") +
+  labs(x = "Tree (species • ID)",
+       y = "Mean Predawn Water Potential (MPa)",
+       title = "Driest and Wettest 10 Trees per Species", 
+       subtitle = "(Mean PDs for measurements taken Aug–Sep over from 2022-2024 years)") +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none",
+        strip.text = element_text(face = "bold"))
+```
+
+Just 2022:
+
+```{r}
+# 1) Filter to predawn only, Aug–Sep, add year, and keep only trees with ≥3 years of measurements 
+df2 <- wp_allyears %>% 
+  mutate(year = substr(as.character(date), 1, 4)) %>% 
+  filter(pd_md == "pd",
+         month %in% 8:9,
+         year == 2022)
+
+# 2) Mean WP per tree *per year* (keep species)
+tree_year <- df2 %>%
+  group_by(individual_id, species, site) %>%
+  summarise(mean_wp = mean(water_potential_mean, na.rm = TRUE),
+            .groups = "drop")
+
+# 4) Bottom/Top 10 *within each species*
+lowest10_by_species <- tree_year %>%
+  group_by(species) %>%
+  slice_min(mean_wp, n = 10, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(rank = "Lowest 10")
+
+highest10_by_species <- tree_year %>%
+  group_by(species) %>%
+  slice_max(mean_wp, n = 10, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(rank = "Highest 10")
+
+
+extreme_trees_by_species <- bind_rows(lowest10_by_species, highest10_by_species)
+
+# --- Visualization ---
+
+# Label that’s unique across species (for ordering) but shows ID clearly
+extreme_trees_by_species <- extreme_trees_by_species %>%
+  mutate(tree_lab = paste0(species, " • ", individual_id),
+         tree_lab = fct_reorder(tree_lab, mean_wp))
+
+# Bars: top/bottom 10 per species (faceted)
+ggplot(extreme_trees_by_species,
+       aes(x = tree_lab, y = mean_wp, fill = rank)) +
+  geom_col(color = "black") +
+  coord_flip() +
+  facet_wrap(~ species + rank, scales = "free_y") +
+  labs(x = "Tree (species • ID)",
+       y = "Mean Predawn Water Potential (MPa)",
+       title = "Driest and Wettest 10 Trees per Species", 
+       subtitle = "(Mean PDs for measurements taken Aug–Sep over from 2022 years)") +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none",
+        strip.text = element_text(face = "bold"))
+```
+
