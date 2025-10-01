@@ -12,22 +12,23 @@
   library(rlang)
 }
 
-#### ========================== ####
-####   SET WORKING DIRECTORY    ####
-#### ========================== ####
-{
-#setwd("/Users/sescobaralonso/Library/CloudStorage/GoogleDrive-sescobaralonso@ucsb.edu/Shared drives/Anderegg Lab/Post-fire Regen Projects/Calfire Project/Data/Tcrit/Run4_Calfire")
-  #my_data <- read.csv("Data/file1.csv") #Set the working directory to the run file
-  setwd(here())
-    getwd()
-}
-
 #### ================================================ ####
 ####.      CLEANING WORKSPACE BETWEEN RUN ANALYSIS    ####
 #### ================================================ ####
 rm(list = ls())
 dev.off()
 cat("\014")
+
+#### ========================== ####
+####   SET WORKING DIRECTORY    ####
+#### ========================== ####
+{
+  #setwd("/Users/sescobaralonso/Library/CloudStorage/GoogleDrive-sescobaralonso@ucsb.edu/Shared drives/Anderegg Lab/Post-fire Regen Projects/Calfire Project/Data/Tcrit/Run4_Calfire")
+  #my_data <- read.csv("Data/file1.csv") #Set the working directory to the run file
+  setwd(here("scripts", "Thermo_Water"))
+  getwd()
+}
+
 
 #### ========================== ####
 ####      CUSTOM FUNCTIONS      ####
@@ -104,9 +105,10 @@ cat("\014")
 #### ========================== ####
 {
   xlow         <- 31      # low end ramp temperature removing initial values (30 as default)
-  xhigh        <- 60       # high end ramp temperature removing highest values (60 as default)
+  xhigh        <- 85       # high end ramp temperature removing highest values (60 as default)
   maxthreshold <- 0.9      # value between 0 and 1 for fluorescence (0.9 as default)
   csv <- read.csv(paste0("./data_labels/", parts[1], "_run", run_number, "_labels.csv"))[, 1:2]
+  csv <- csv %>% clean_names() #should be grid_id and sample
 }
 
 #### =============================== ####
