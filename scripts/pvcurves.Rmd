@@ -26,7 +26,12 @@ pv_df <- read_csv(here::here("raw-data", "pv_curves_long_rayna.csv")) %>%
          other_non_stem_mass_g,
          total_nonsample_wt,
          leaf_area,
-         ), .direction = "down")
+         ), .direction = "down") %>% 
+  ungroup()
+
+pv_df_clean <- pv_df %>% 
+  dplyr::select(tree, date, rehydrated, pd_or_md, tlp, rwc_tlp, e, cft, ctlp, cft_2, leaf_area) %>% 
+  distinct()
 ```
 
 Rehydrated vs. non-rehydrated: 
@@ -43,12 +48,56 @@ pv_df %>%
 
 
 ```{r}
-pv_df %>% 
-  drop_na(pd_or_md) %>% 
-  ggplot(aes(y = tlp,
-         x = pd_or_md,
-         color = rehydrated)) +
-  geom_point() +
-  geom_boxplot(fill = NA)
-```
+library(dplyr)
+library(ggplot2)
+library(emmeans)       # post-hoc
+library(stringr)
 
+# 1) Clean data & ensure factors
+dat <- pv_df %>%
+  dplyr::select(tlp, pd_or_md, rehydrated) %>%
+  tidyr::drop_na() %>%
+  distinct() %>% 
+  mutate(
+    pd_or_md   = as.factor(pd_or_md),
+    rehydrated = as.factor(rehydrated)
+  )
+
+# 2) Two-way ANOVA via lm (same as you had)
+m1 <- lm(tlp ~ pd_or_md * rehydrated, data = dat)
+anova(m1)      # Type I SS; for Type II/III you could use car::Anova(m1, type=2/3)
+summary(m1)
+
+# 3) Tukey on all combos (pd_or_md × rehydrated) and get compact letter display
+emm  <- emmeans(m1, ~ pd_or_md * rehydrated)                  # cell means
+cld  <- cld(emm, adjust = "tukey", Letters = letters)
+letters_df <- as.data.frame(cld) |>
+  mutate(letter = str_replace_all(.group, "\\s+", "")) |>
+  dplyr::select(pd_or_md, rehydrated, letter)
+
+# 4) Compute y-positions for letters (just above each box)
+ypos <- dat %>%
+  group_by(pd_or_md, rehydrated) %>%
+  summarise(y = max(tlp, na.rm = TRUE), .groups = "drop")
+
+label_df <- left_join(letters_df, ypos, by = c("pd_or_md","rehydrated")) %>%
+  mutate(y = y + 0.05 * diff(range(dat$tlp, na.rm = TRUE)))   # small offset
+
+# 5) Plot with dodged boxplots and letters
+ggplot(dat, aes(x = pd_or_md, y = tlp, fill = rehydrated)) +
+  geom_boxplot(position = position_dodge(width = 0.8), outlier.shape = NA) +
+  geom_jitter(
+  aes(color = rehydrated),
+  alpha = 0.5,
+  position = position_jitterdodge(jitter.width = 0.1, dodge.width = 0.8),
+  show.legend = FALSE
+) +
+  geom_text(data = label_df,
+            aes(x = pd_or_md, y = y, label = letter, group = rehydrated),
+            position = position_dodge(width = 0.8), vjust = 0) +
+  labs(x = "Time of day", y = "TLP") +
+  theme_classic() +
+  coord_cartesian(ylim = c(min(dat$tlp, na.rm = TRUE),
+                           max(label_df$y, na.rm = TRUE) + 0.02 * diff(range(dat$tlp, na.rm = TRUE))))
+
+```
