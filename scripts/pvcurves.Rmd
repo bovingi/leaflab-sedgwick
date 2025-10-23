@@ -32,6 +32,9 @@ pv_df <- read_csv(here::here("raw-data", "pv_curves_long_rayna.csv")) %>%
 pv_df_clean <- pv_df %>% 
   dplyr::select(tree, date, rehydrated, pd_or_md, tlp, rwc_tlp, e, cft, ctlp, cft_2, leaf_area) %>% 
   distinct()
+
+unique(pv_df$date
+       )
 ```
 
 Rehydrated vs. non-rehydrated: 
