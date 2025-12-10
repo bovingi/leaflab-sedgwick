@@ -149,4 +149,12 @@ ggplot(extreme_trees_by_species,
   theme(legend.position = "none",
         strip.text = element_text(face = "bold"))
 ```
+#TCrit data:
+```{r}
+run1_df <- read_csv(here("scripts", "Thermo_Water", "data_processed", "20250917_run1_data_results.csv"))
+run2_df <- read_csv(here("scripts", "Thermo_Water", "data_processed", "20250923_run2_data_results.csv"))
+run3_df <- read_csv(here("scripts", "Thermo_Water", "data_processed", "20250930_run3_data_results.csv"))
+
+tcrit_df_allruns <- bind_rows(run1_df, run2_df, run3_df)
+```
 
