@@ -7,9 +7,11 @@
 #### =============================== ####
 {
   library(segmented)
+  library(tidyverse)
   library(readr)
   library(here)
   library(rlang)
+  library(janitor)
 }
 
 #### ================================================ ####
@@ -25,7 +27,7 @@ cat("\014")
 {
   #setwd("/Users/sescobaralonso/Library/CloudStorage/GoogleDrive-sescobaralonso@ucsb.edu/Shared drives/Anderegg Lab/Post-fire Regen Projects/Calfire Project/Data/Tcrit/Run4_Calfire")
   #my_data <- read.csv("Data/file1.csv") #Set the working directory to the run file
-  setwd(here("scripts", "Thermo_Water"))
+  setwd(here("scripts", "svea"))
   getwd()
 }
 
