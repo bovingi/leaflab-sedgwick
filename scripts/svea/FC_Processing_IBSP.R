@@ -7,9 +7,11 @@
 #### =============================== ####
 {
   library(segmented)
+  library(tidyverse)
   library(readr)
   library(here)
   library(rlang)
+  library(janitor)
 }
 
 #### ================================================ ####
@@ -25,7 +27,7 @@ cat("\014")
 {
   #setwd("/Users/sescobaralonso/Library/CloudStorage/GoogleDrive-sescobaralonso@ucsb.edu/Shared drives/Anderegg Lab/Post-fire Regen Projects/Calfire Project/Data/Tcrit/Run4_Calfire")
   #my_data <- read.csv("Data/file1.csv") #Set the working directory to the run file
-  setwd(here("scripts", "Thermo_Water"))
+  setwd(here("scripts", "svea"))
   getwd()
 }
 
@@ -105,7 +107,7 @@ cat("\014")
 #### ========================== ####
 {
   xlow         <- 35      # low end ramp temperature removing initial values (30 as default)
-  xhigh        <- 65       # high end ramp temperature removing highest values (60 as default)
+  xhigh        <- 80       # high end ramp temperature removing highest values (60 as default)
   maxthreshold <- 0.9      # value between 0 and 1 for fluorescence (0.9 as default)
   csv <- read.csv(paste0("./data_labels/", parts[1], "_run", run_number, "_labels.csv"))[, 1:2]
   csv <- csv %>% clean_names() #should be grid_id and sample
