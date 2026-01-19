@@ -1,0 +1,120 @@
+---
+title: "shrubs"
+author: "Indra Boving"
+date: "2026-01-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+###Tree information: 
+
+- tree locations, species, and notes: 
+
+```{r}
+core_trees_latlong <- read_csv(here("raw-data", "tree info", "tree_locations.csv")) %>% 
+  clean_names() %>% 
+  mutate(individual_id = as.numeric(name)) %>% 
+    select(x, y, individual_id )  %>% 
+  rename(latitude = x, 
+         longitude = y)
+
+pipers_trees_latlong <- read_csv(here("raw-data", "tree info", "serpentine_tree_locations.csv")) %>% 
+  clean_names()%>% 
+  rename(latitude = xcoord, 
+         longitude = ycoord, 
+         individual_id = tree_id) %>% 
+  select(individual_id,latitude, longitude)
+
+othertrees_latlong <- read_csv(here("raw-data", "tree info", "MissingTreeLatLon_20250828.csv")) %>% 
+  clean_names() %>% 
+  mutate(individual_id = as.numeric(individual_id)) %>% 
+  select(individual_id,latitude, longitude)
+
+trees_latlong <- bind_rows(pipers_trees_latlong, 
+                           core_trees_latlong, 
+                           othertrees_latlong)
+```
+
+#shrubs: 
+
+```{r}
+unique(wp_2022_2023$species
+       )
+
+unique(wp_2024$species
+       )
+```
+
+```{r}
+#2022 and 2023 data
+wp_2022_2023 <- read_csv(here("raw-data", "water potentials", "2022and2023", "2022_2023_alldates_wp.csv")) %>% 
+  clean_names() %>% 
+  mutate(year = year(ymd(date))) %>% 
+  filter(species %in% c("LEU", "ARCA")) %>% 
+  mutate(species = case_when(
+    species %in% c("LEU") ~ "SALE", 
+    TRUE ~ as.character(species)
+  ))
+
+#2024 data all dates.
+wp_2024 <- bind_rows(read_csv(here("raw-data", "water potentials", "2024", "20240413_wp.csv")), 
+                     read_csv(here("raw-data", "water potentials", "2024","20240530_wp.csv")),
+                     read_csv(here("raw-data", "water potentials", "2024","20240903_wp.csv")),
+                     read_csv(here("raw-data", "water potentials", "2024","20240905_wp.csv"))
+                     ) %>% 
+  clean_names() %>% 
+  mutate(year = year(ymd(date))) %>% 
+  mutate(water_potential_mpa = case_when(
+    water_potential_mpa %in% c(1903.000) ~ 1.903, #comma instead of point; fixed in google sheets!
+    water_potential_mpa %in% c(1467.000) ~ 1.467, #comma instead of point; fixed in google sheets!
+    water_potential_mpa %in% c(1421.000) ~ 1.421, #comma instead of point; fixed in google sheets!
+    TRUE ~ as.numeric(water_potential_mpa)
+  )) %>% 
+  filter(species %in% c("ARCA", "SALE"))
+
+wp_shrubs  <- bind_rows(wp_2024, 
+                    wp_2022_2023) %>% 
+  mutate(unique_id = case_when(
+    site %in% c("Lisque", "LL") & species %in% c("SALE") ~ "LL_SALE",
+    site %in% c("Cucu Mesa") & species %in% c("SALE") ~ "CC_SALE",
+    site %in% c("Chamise") & species %in% c("SALE") ~ "Chamise_SALE",
+    site %in% c("Lisque", "LL") & species %in% c("ARCA") ~ "LL_ARCA",
+    site %in% c("Cucu Mesa") & species %in% c("ARCA") ~ "CC_ARCA",
+    site %in% c("Chamise") & species %in% c("ARCA") ~ "Chamise_ARCA",
+    TRUE ~ NA
+  ))  %>% 
+  filter(!(flag %in% c("Weird", "weird")))%>% 
+  select(species, unique_id, date, year, pd_md, water_potential_mpa)
+
+```
+
+
+#look for outliers: 
+```{r}
+wp_wide <-wp_shrubs %>% 
+  pivot_wider(names_from = c(pd_md),
+              values_from = c(water_potential_mpa), 
+              values_fn = function(x) mean(x, na.rm = TRUE)) %>% 
+  mutate(month = month(date)) %>% 
+  group_by(unique_id, date, year) %>% 
+  fill(c(pd, md), .direction = "downup")
+
+p <- wp_wide %>% 
+  ggplot(aes(y = md,
+             x = pd, 
+             color = species,
+             shape = as.factor(unique_id),
+             label = as.factor(unique_id))) +
+  geom_point() +
+  facet_wrap(~year, scales = "free") +
+  geom_abline()
+
+p
+
+plotly::ggplotly(p)
+```
+
