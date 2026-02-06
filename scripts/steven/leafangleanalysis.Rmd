@@ -1,0 +1,24 @@
+---
+title: "Leaf Angle"
+author: "Indra Boving"
+date: "2026-02-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+Read in data: 
+
+Write info here!
+
+```{r}
+#read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
+leafangle_df <- read_csv("leafangles_v1.csv")
+
+#look at it: 
+leafangle_df
+```
+
