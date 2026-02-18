@@ -8,16 +8,55 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(janitor) #clean up datasets nicely
+library(here) #helpful for directing R around the computer
 ```
 
 Read in data: 
 
 Write info here!
 
+Columns are these: 
+angle_of_photo_taken: how much the camera was tilted side-to-side. Ignoring if less than 5 degrees.
+angle_related_to_straight_line: relative to a vertical line, where < 90 is facing up, and >90 is facing down.
+z_axis: 90 = flat leaf is facing camera, 0 = leaf is only viewed from the side
+
+
 ```{r}
 #read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
-leafangle_df <- read_csv("leafangles.csv")
+leafangle_df <- read_csv("leafangles.csv") %>% 
+  clean_names() 
+  
+leafangle_means_df <- leafangle_df %>% 
+  group_by(tree_number) %>% #says "cluster my data into groups by tree_id
+  mutate(mean_angle = mean(angle_related_to_straight_line),
+         sd_angle = sd(angle_related_to_straight_line)) %>% #make a new column called 'mean_angle' and make it the mean value of the angle column, do this per tree (from the group_by)
+  select(tree_number, mean_angle, sd_angle) %>% #keep only these two columns, drop the rest
+  distinct() #keep only rows that are unique, dont keep duplicates
 
 #look at it: 
 leafangle_df
 ```
+
+
+Add in the species data: 
+
+```{r}
+#read in the csv with the water potential data for each tree: 
+tree_wp_df <- read_csv(here("processed-data", "sedgwick_mpas_allyears_20250829.csv")) %>% 
+  rename( tree_number = individual_id)
+
+combined_df <- merge(leafangle_means_df, tree_wp_df, by = c("tree_number"))
+```
+
+Make some figures: 
+```{r}
+#use a function called ggplot to make figures
+combined_df %>% 
+  ggplot(aes(y = mean_angle, 
+             x = species,
+             fill = species)) +
+  geom_point() +
+  geom_boxplot(alpha = .3)
+```
+
