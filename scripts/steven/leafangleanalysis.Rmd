@@ -1,6 +1,6 @@
 ---
 title: "Leaf Angle"
-author: "Indra Boving"
+author: "Indra Boving and Steven Le"
 date: "2026-02-06"
 output: html_document
 ---
@@ -16,7 +16,7 @@ Write info here!
 
 ```{r}
 #read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
-leafangle_df <- read_csv("leafangles_v1.csv")
+leafangle_df <- read_csv("leafangles.csv")
 
 #look at it: 
 leafangle_df
