@@ -82,6 +82,10 @@ tree_wp_df <- read_csv(here("processed-data", "sedgwick_mpas_allyears_20250829.c
 
 combined_df <- merge(leafangle_means_df, tree_wp_df, by = c("tree_number"))
 ```
+
+
+#Plots
+
 ```{r}
 #use a function called ggplot to make figures
 combined_df %>% 
@@ -91,6 +95,8 @@ combined_df %>%
   geom_point() +
   geom_boxplot(alpha = .3)
 ```
+
+
 ```{r}
 combined_df %>% 
   ggplot(aes(x = mean_angle, 
@@ -98,4 +104,97 @@ combined_df %>%
              fill = mean_angle)) +
   geom_col(width = 1)
 ```
+```{r}
+combined_df %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = pd_md)) +
+  geom_point() +
+  facet_wrap(~date)
+```
+We need to make a column for week or month!
 
+```{r}
+combined_df_time <- combined_df %>% 
+  mutate(date_formated = ymd(date),
+         month = month(date_formated), 
+         year = year(date_formated)) %>% 
+  mutate(angle_absolute = case_when(
+         mean_angle > 90 ~ 90 - (mean_angle - 90), 
+         TRUE ~ as.numeric(mean_angle)))
+
+str(combined_df_time)
+```
+
+Middays vs. leaf angle
+
+```{r}
+combined_df_time %>% 
+  filter(year %in% c(2024, 2025),
+         pd_md == "md") %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = pd_md, 
+             shape = species)) +
+  geom_point() +
+  facet_wrap(~year*month) +
+  geom_smooth(method = "lm")
+```
+
+```{r}
+combined_df_time %>% 
+  filter(year %in% c(2024, 2025),
+         pd_md == "md") %>% 
+  ggplot(aes(x = angle_absolute, 
+             y = water_potential_mean, 
+             color = pd_md, 
+             shape = species)) +
+  geom_point() +
+  facet_wrap(~year*month) +
+  geom_smooth(method = "lm")
+```
+
+Predawns vs. leaf angle: 
+
+```{r}
+combined_df_time %>% 
+  filter(year %in% c(2024, 2025),
+         pd_md == "pd") %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = pd_md, 
+             shape = species)) +
+  geom_point() +
+  facet_wrap(~year*month, scales = "free") +
+  geom_smooth(method = "lm")
+```
+```{r}
+combined_df_time %>% 
+  filter(year %in% c(2024, 2025),
+         pd_md == "pd") %>% 
+  ggplot(aes(x = angle_absolute, 
+             y = water_potential_mean, 
+             color = pd_md, 
+             shape = species)) +
+  geom_point() +
+  facet_wrap(~year*month, scales = "free") +
+  geom_smooth(method = "lm")
+```
+
+#####To do: 
+- Make the water potential figure prettier, easier to read
+- Make versions for different months
+- Make the leaf angle and water potentials plots prettier
+- If time, add more measurements, but not necessarily needed 
+- Summarize the papers youve read (6), 2-3 sentences each and how its relevant for your project. 
+
+```{r}
+#use a function called ggplot to make figures
+combined_df_time %>% 
+  filter(month %in% c(9) & year %in% c(2024)) %>% 
+  ggplot(aes(y = water_potential_mean, 
+             x = species,
+             fill = pd_md)) +
+  geom_point() +
+  geom_boxplot(alpha = .3)
+```

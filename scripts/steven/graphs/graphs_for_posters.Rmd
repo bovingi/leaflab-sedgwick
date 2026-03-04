@@ -1,0 +1,150 @@
+---
+title: "EEMB 140L -- Figures"
+author: "your name here"
+date: " "
+output:
+  pdf_document: default
+  html_document: default
+---
+#Settings and librarys:
+```{r}
+library(tidyverse)
+```
+
+#Goal: Make a plot that works well on a poster!
+
+For a poster, you want your plots to be legible from at least 6 feet away. This means making figures with larger fonts than you would think (minimum of 18 point font, but I usually go for between 24 and 30), and designing simple and clear graphics without distracting information. Colors should be easily distinguishable and color blind friendly (more on that here https://mk.bcgsc.ca/colorblind/). Follow along below to make a plot that meets these criteria.
+
+#Read in data: 
+```{r}
+# read in the csv as a variable called
+oak_data <- read.csv("Blue_Oak_Traits.csv") #make sure this dataset is in the same folder as your .Rmd file within yur R project, or use there here() function to direct R to the correct folder
+
+#see what it looks like!
+head(oak_data)
+```
+#Make some plots!
+
+Basic scatterplot:
+```{r}
+#Basic plot: 
+oak_data %>% 
+  ggplot(aes(x = mSLA, y = mleafsize, color = site)) +
+  geom_point()
+```
+
+Lets add some regression lines and change the point size so its easier to see: 
+
+```{r}
+oak_data %>% 
+  ggplot(aes(x = mSLA, y = mleafsize, color = site)) +
+  geom_point(size = 3) + #designate the point size here! Larger point sizes can be good for a poster. 
+  geom_smooth(method = "lm", se = F) #tells R to place a linear model over the points (see what happens if you dont use the 'method = "lm" call!)
+
+#how to save something quickly
+ggsave("p.jpeg")
+```
+Lets change the axis titles to be more interpretable ( and include units!)
+
+```{r}
+oak_data %>% 
+  ggplot(aes(x = mSLA, y = mleafsize, color = site)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = F) +
+  labs(y = "Mean Leaf Size (cm2)",
+       x = "Specific Leaf Area (cm2/g)", 
+       color = "Site")
+```
+But we ideally want those superscripts to work, so we can use bquote() as shown below (note what is in quotations vs what isn't, and note where we add extra spaces to make the spacing work out!)
+
+```{r}
+oak_data %>% 
+  ggplot(aes(x = mSLA, y = mleafsize, color = site)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = F) +
+  labs(y = bquote("Mean Leaf Size " (cm^2)), #to make superscripts work, use bquote()
+       x = bquote("Specific Leaf Area " (cm^2 /g)), 
+       color = "Site")
+```
+Now lets change up the background aesthetics by working in the theme() call. I prefer not to have lines in the back of my figures, so here I remove them: 
+
+```{r}
+oak_data %>% 
+  ggplot(aes(x = mSLA, y = mleafsize, color = site)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = F) +
+  labs(y = bquote("Mean Leaf Size " (cm^2)), #to make superscripts work, use bquote()
+       x = bquote("Specific Leaf Area " (cm^2 /g)), 
+       color = "Site")+
+  theme(panel.background = element_rect(fill='white', colour='black'), # Make background white and border black
+          panel.grid.major = element_blank(),  # Hide major gridlines
+          panel.grid.minor = element_blank(),# Hide minor gridlines
+          strip.background = element_rect(fill = "white"), #make background white
+          legend.position = c(.2, .8) #change where the legend is, optionsa are "top", "left", "right", and "bottom"
+        )  
+```
+Now lets change the font size to be more legible on a poster, and also create the plot as an object using the <- symbol (remember, an object is something that is now stored in your Environment, so you can call it up later. 
+
+```{r}
+
+plot <- oak_data %>% #make the plot read to an object that we name 'plot'
+  ggplot(aes(x = mSLA, y = mleafsize, color = site)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = F) +
+  labs(y = bquote("Mean Leaf Size " (cm^2)), #to make superscripts work, use bquote()
+       x = bquote("Specific Leaf Area " (cm^2 /g)), 
+       color = "Site")+
+  theme(panel.background = element_rect(fill='white', colour='black'), # Make background white and border black
+          panel.grid.major = element_blank(),  # Hide major gridlines
+          panel.grid.minor = element_blank(),# Hide minor gridlines
+          strip.background = element_rect(fill = "white"), #make background white
+          legend.position = "bottom", #change where the legend is, optionsa are "top", "left", "right", and "bottom"
+        
+#Change the font sizes: 
+          axis.title = element_text(size= 34), #change the size of the axis titles, you probably want to aim for 24-30 size
+          axis.text = element_text(size = 30), #change the size of the axis text, you probably want to aim for 18-24
+          legend.title = element_text(size = 34), #change the legend title size, you probably want to aim for 24-30 size
+          legend.text = element_text(size = 30), #change the legend text size, you probably want to aim for 18-24
+        )    
+plot
+```
+That looks weird! We need to make the whole figure bigger to look better with the updated font sizes. We do this by changing the settings of the chunk in the top of the chunk (where the code says ```{r}) 
+
+```{r, fig.height=6, fig.width=8}
+plot #now we can just call 'plot' to avoid having to copy ALL of the code we just wrote
+```
+Now that we have a plot that hits all of the basics, we can start making it more fun using colors! Check out these cool resources for finding colors that pop: 
+
+Color names and hex codes: 
+https://r-charts.com/colors/ 
+https://www.rapidtables.com/web/color/RGB_Color.html 
+
+Color combos for color blindness (non-exhaustive, but a good place to start!)
+https://davidmathlogic.com/colorblind/#%23D81B60-%231E88E5-%23FFC107-%23004D40 
+
+Color combos that require downloading a package:
+
+https://github.com/an-bui/calecopal (Color palettes inspired by california landscapes! written by EEMB graduate students!)
+https://github.com/BlakeRMills/MetBrewer (colors based on paintings!)
+
+```{r, fig.height=6, fig.width=10}
+plot_pretty_colors <- plot + #create a new plot object with the colors you want!
+  scale_color_manual(values = c("#FFB000", "#DC267F")) #using hex codes
+  
+
+plot + 
+  scale_color_manual(values = c("orange", "maroon")) #using words
+
+```
+Great! We like the look of that plot! Now let's get it onto our poster. We can do this by either, 1) screenshotting the image (quick and dirty approach), or 2) using ggsave() (which is the better way to ensure that you get a good quality image). More on ggsave here:https://ggplot2.tidyverse.org/reference/ggsave.html 
+
+```{r}
+#use ggsave: 
+ggsave(plot = plot_pretty_colors, #what plot to save
+      filename = "Figure1.jpeg", #where to save it, what to call it
+      height = 6.5, 
+      width = 7,
+      units = c("in"),
+      dpi = 300 #resolution. 300 tends to work well!
+      )
+```
