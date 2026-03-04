@@ -59,4 +59,43 @@ combined_df %>%
   geom_point() +
   geom_boxplot(alpha = .3)
 ```
+```{r}
+#read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
+leafangle_df <- read_csv("leafangles.csv") %>% 
+  clean_names() 
+  
+leafangle_means_df <- leafangle_df %>% 
+  group_by(tree_number) %>% #says "cluster my data into groups by tree_id
+  mutate(mean_angle = mean(angle_related_to_straight_line),
+         sd_angle = sd(angle_related_to_straight_line)) %>% #make a new column called 'mean_angle' and make it the mean value of the angle column, do this per tree (from the group_by)
+  select(tree_number, mean_angle, sd_angle) %>% #keep only these two columns, drop the rest
+  distinct() #keep only rows that are unique, dont keep duplicates
+
+#look at it: 
+leafangle_df
+```
+
+```{r}
+#read in the csv with the water potential data for each tree: 
+tree_wp_df <- read_csv(here("processed-data", "sedgwick_mpas_allyears_20250829.csv")) %>% 
+  rename( tree_number = individual_id)
+
+combined_df <- merge(leafangle_means_df, tree_wp_df, by = c("tree_number"))
+```
+```{r}
+#use a function called ggplot to make figures
+combined_df %>% 
+  ggplot(aes(y = water_potential_mean, 
+             x = species,
+             fill = species)) +
+  geom_point() +
+  geom_boxplot(alpha = .3)
+```
+```{r}
+combined_df %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             fill = mean_angle)) +
+  geom_col(width = 1)
+```
 
