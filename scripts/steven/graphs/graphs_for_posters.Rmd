@@ -18,7 +18,7 @@ For a poster, you want your plots to be legible from at least 6 feet away. This 
 #Read in data: 
 ```{r}
 # read in the csv as a variable called
-oak_data <- read.csv("Blue_Oak_Traits.csv") #make sure this dataset is in the same folder as your .Rmd file within yur R project, or use there here() function to direct R to the correct folder
+oak_data <- read.csv("scripts/Steven/graphs/Blue_Oak_Traits.csv") #make sure this dataset is in the same folder as your .Rmd file within yur R project, or use there here() function to direct R to the correct folder
 
 #see what it looks like!
 head(oak_data)

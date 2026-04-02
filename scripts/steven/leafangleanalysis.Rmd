@@ -24,7 +24,7 @@ z_axis: 90 = flat leaf is facing camera, 0 = leaf is only viewed from the side
 
 ```{r}
 #read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
-leafangle_df <- read_csv("leafangles.csv") %>% 
+leafangle_df <- read_csv("scripts/Steven/leafangles.csv") %>% 
   clean_names() 
   
 leafangle_means_df <- leafangle_df %>% 
@@ -61,7 +61,7 @@ combined_df %>%
 ```
 ```{r}
 #read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
-leafangle_df <- read_csv("leafangles.csv") %>% 
+leafangle_df <- read_csv("scripts/Steven/leafangles.csv") %>% 
   clean_names() 
   
 leafangle_means_df <- leafangle_df %>% 
@@ -182,11 +182,11 @@ combined_df_time %>%
 ```
 
 #####To do: 
-- Make the water potential figure prettier, easier to read
-- Make versions for different months
-- Make the leaf angle and water potentials plots prettier
-- If time, add more measurements, but not necessarily needed 
-- Summarize the papers youve read (6), 2-3 sentences each and how its relevant for your project. 
+- Make the water potential figure prettier, easier to read   DONE
+- Make versions for different months   DONE
+- Make the leaf angle and water potentials plots prettier   DONE
+- If time, add more measurements, but not necessarily needed   X 
+- Summarize the papers youve read (6), 2-3 sentences each and how its relevant for your project   DONE
 
 ```{r}
 #use a function called ggplot to make figures
@@ -198,3 +198,307 @@ combined_df_time %>%
   geom_point() +
   geom_boxplot(alpha = .3)
 ```
+
+```{r}
+combined_df_time %>% 
+  filter(month %in% c(9) & year %in% c(2024)) %>% 
+  ggplot(aes(y = water_potential_mean, 
+             x = species,
+             fill = pd_md)) +
+  geom_point() +
+  geom_boxplot(alpha = .3) + 
+  labs(y = "Mean Water Potential",
+       x = "Species", 
+       fill = "Time")
+```
+
+```{r}
+combined_df_time %>% 
+  filter(month %in% c(9) & year %in% c(2024)) %>% 
+  ggplot(aes(y = water_potential_mean, 
+             x = species,
+             fill = pd_md)) +
+  geom_point() +
+  geom_boxplot(alpha = .3) + 
+  labs(y = "Mean Water Potential",
+       x = "Species", 
+       fill = "Time") + 
+  theme(panel.background = element_rect(colour='black'))
+```
+
+```{r}
+combined_df_time %>% 
+  filter(month %in% c(9) & year %in% c(2024)) %>% 
+  ggplot(aes(y = water_potential_mean, 
+             x = species,
+             fill = pd_md)) +
+  geom_point() + 
+  geom_boxplot(alpha = .3) + 
+  scale_fill_manual(
+    values = c("pd" = "#4682B4", "md" = "lightcoral"), 
+    labels = c("pd" = "Predawn", "md" = "Midday")) +
+  labs(y = "Mean Water Potential",
+       x = "Species", 
+       fill = "Time:") + 
+  theme(
+panel.background = element_rect(colour = 'black'),     
+text = element_text(family = "Times New Roman"), 
+    legend.position = "right",                    
+    axis.title.y = element_text(size = 25, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 25, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12))
+#Water Potential Midday vs. Predawn Figure 1#
+```
+
+```{r}
+combined_df_time %>% 
+  filter(month %in% c(9) & year %in% c(2023)) %>% 
+  ggplot(aes(y = water_potential_mean, 
+             x = species,
+             fill = pd_md)) +
+  geom_point() + 
+  geom_boxplot(alpha = .3) + 
+  scale_fill_manual(
+    values = c("pd" = "#4682B4", "md" = "lightcoral"), 
+    labels = c("pd" = "Predawn", "md" = "Midday")) +
+  labs(y = "Mean Water Potential",
+       x = "Species", 
+       fill = "Time:") + 
+  theme(
+panel.background = element_rect(colour = 'black'),     
+text = element_text(family = "Times New Roman"), 
+    legend.position = "right",                    
+    axis.title.y = element_text(size = 25, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 25, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12))
+#Water Potential Midday vs. Predawn Figure 2#
+```
+
+```{r}
+combined_df_time %>% 
+  filter(month %in% c(9) & year %in% c(2022)) %>% 
+  ggplot(aes(y = water_potential_mean, 
+             x = species,
+             fill = pd_md)) +
+  geom_point() + 
+  geom_boxplot(alpha = .3) + 
+  scale_fill_manual(
+    values = c("pd" = "#4682B4", "md" = "lightcoral"), 
+    labels = c("pd" = "Predawn", "md" = "Midday")) +
+  labs(y = "Mean Water Potential",
+       x = "Species", 
+       fill = "Time:") + 
+  theme(
+panel.background = element_rect(colour = 'black'),     
+text = element_text(family = "Times New Roman"), 
+    legend.position = "right",                    
+    axis.title.y = element_text(size = 25, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 25, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12))
+#Water Potential Midday vs. Predawn Figure 3#
+```
+
+```{r}
+combined_df_time %>% 
+filter(year == 2024,
+         month == "9",         
+       pd_md == "md") %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = species, 
+             shape = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  labs(y = "Mean Water Potential",
+       x = "Mean Angle (Degrees)", 
+       title = "Water Potential at Midday",
+       subtitle = "September 2024",
+       color = "Species:",
+       shape = "Species:") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  guides(color = "none") + 
+  theme(panel.background = element_rect(colour = 'black'),   
+        text = element_text(family = "Times New Roman"),
+  axis.title.y = element_text(size = 17, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 17, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
+#Water Potential at Midday Figure 1#
+```
+
+```{r}
+combined_df_time %>% 
+filter(year == 2023,
+         month == "9",         
+       pd_md == "md") %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = species, 
+             shape = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  labs(y = "Mean Water Potential",
+       x = "Mean Angle (Degrees)", 
+       title = "Water Potential at Midday",
+       subtitle = "September 2023",
+       color = "Species:",
+       shape = "Species:") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  guides(color = "none") + 
+  theme(panel.background = element_rect(colour = 'black'),   
+        text = element_text(family = "Times New Roman"),
+  axis.title.y = element_text(size = 17, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 17, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
+#Water Potential at Midday Figure 2#
+```
+
+```{r}
+combined_df_time %>% 
+filter(year == 2022,
+         month == "9",         
+       pd_md == "md") %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = species, 
+             shape = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  labs(y = "Mean Water Potential",
+       x = "Mean Angle (Degrees)", 
+       title = "Water Potential at Midday",
+       subtitle = "September 2022",
+       color = "Species:",
+       shape = "Species:") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  guides(color = "none") + 
+  theme(panel.background = element_rect(colour = 'black'),   
+        text = element_text(family = "Times New Roman"),
+  axis.title.y = element_text(size = 17, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 17, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
+#Water Potential at Midday Figure 3#
+```
+
+```{r}
+combined_df_time %>% 
+filter(year == 2024,
+         month == "9",         
+       pd_md == "pd") %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = species, 
+             shape = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  labs(y = "Mean Water Potential",
+       x = "Mean Angle (Degrees)", 
+       title = "Water Potential at Predawn",
+       subtitle = "September 2024",
+       color = "Species:",
+       shape = "Species:") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  guides(color = "none") + 
+  theme(panel.background = element_rect(colour = 'black'),   
+        text = element_text(family = "Times New Roman"),
+  axis.title.y = element_text(size = 17, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 17, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
+#Water Potential at Predawn Figure 1#
+```
+
+```{r}
+combined_df_time %>% 
+filter(year == 2023,
+         month == "9",         
+       pd_md == "pd") %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = species, 
+             shape = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  labs(y = "Mean Water Potential",
+       x = "Mean Angle (Degrees)", 
+       title = "Water Potential at Predawn",
+       subtitle = "September 2023",
+       color = "Species:",
+       shape = "Species:") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  guides(color = "none") + 
+  theme(panel.background = element_rect(colour = 'black'),   
+        text = element_text(family = "Times New Roman"),
+  axis.title.y = element_text(size = 17, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 17, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
+#Water Potential at Predawn Figure 2#
+```
+
+```{r}
+combined_df_time %>% 
+filter(year == 2022,
+         month == "9",         
+       pd_md == "pd") %>% 
+  ggplot(aes(x = mean_angle, 
+             y = water_potential_mean, 
+             color = species, 
+             shape = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  labs(y = "Mean Water Potential",
+       x = "Mean Angle (Degrees)", 
+       title = "Water Potential at Predawn",
+       subtitle = "September 2022",
+       color = "Species:",
+       shape = "Species:") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  guides(color = "none") + 
+  theme(panel.background = element_rect(colour = 'black'),   
+        text = element_text(family = "Times New Roman"),
+  axis.title.y = element_text(size = 17, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 17, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
+#Water Potential at Predawn Figure 3#
+```
+
