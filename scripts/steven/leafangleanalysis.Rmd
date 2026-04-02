@@ -24,7 +24,10 @@ z_axis: 90 = flat leaf is facing camera, 0 = leaf is only viewed from the side
 
 ```{r}
 #read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
-leafangle_df <- read_csv("scripts/Steven/leafangles.csv") %>% 
+#leafangle_df <- read_csv("scripts/steven/leafangles.csv") %>% 
+#  clean_names() 
+
+leafangle_df <- read_csv(here("scripts", "steven", "leafangles.csv")) %>% 
   clean_names() 
   
 leafangle_means_df <- leafangle_df %>% 
@@ -187,6 +190,25 @@ combined_df_time %>%
 - Make the leaf angle and water potentials plots prettier   DONE
 - If time, add more measurements, but not necessarily needed   X 
 - Summarize the papers youve read (6), 2-3 sentences each and how its relevant for your project   DONE
+
+#####April 2: 
+
+- Double check that sept is actually teh driest for each year
+- Make side-by-side graphs of each year/month that are interesting to compare across years
+- Run statistical tests on leaf angle ~ predawn (see bwlow)
+- Write abstract draft by 2/8, attend workshop if you can! See email from Lee. 
+
+- Think about senior thesis and using LiDar data to get leaf angle, if you want :) 
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter() #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(leaf_angle_mean ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+```
+
 
 ```{r}
 #use a function called ggplot to make figures
