@@ -193,10 +193,10 @@ combined_df_time %>%
 
 #####April 2: 
 
-- Double check that sept is actually teh driest for each year
+- Double check that sept is actually teh driest for each year   DONE
 - Make side-by-side graphs of each year/month that are interesting to compare across years
 - Run statistical tests on leaf angle ~ predawn (see bwlow)
-- Write abstract draft by 2/8, attend workshop if you can! See email from Lee. 
+- Write abstract draft by 2/8, attend workshop if you can! See email from Lee.   DONE  
 
 - Think about senior thesis and using LiDar data to get leaf angle, if you want :) 
 
@@ -208,7 +208,6 @@ df <- combined_df_time %>%
 model <- lm(leaf_angle_mean ~ water_potential_mean, data = df)
 summary(model) #look for p < 0.05 for significance
 ```
-
 
 ```{r}
 #use a function called ggplot to make figures
@@ -250,17 +249,18 @@ combined_df_time %>%
 
 ```{r}
 combined_df_time %>% 
-  filter(month %in% c(9) & year %in% c(2024)) %>% 
+  filter(month %in% c(7) & year %in% c(2022)) %>% 
   ggplot(aes(y = water_potential_mean, 
              x = species,
              fill = pd_md)) +
-  geom_point() + 
+  geom_point(position = position_dodge(width = 0.75)) + 
   geom_boxplot(alpha = .3) + 
   scale_fill_manual(
     values = c("pd" = "#4682B4", "md" = "lightcoral"), 
     labels = c("pd" = "Predawn", "md" = "Midday")) +
   labs(y = "Mean Water Potential",
        x = "Species", 
+       title = "July 2022",
        fill = "Time:") + 
   theme(
 panel.background = element_rect(colour = 'black'),     
@@ -270,23 +270,25 @@ text = element_text(family = "Times New Roman"),
     axis.title.x = element_text(size = 25, margin = margin(t = 10)),
     axis.text = element_text(size = 12),
 legend.title = element_text(size = 15),
-    legend.text = element_text(size = 12))
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)))
 #Water Potential Midday vs. Predawn Figure 1#
 ```
 
 ```{r}
 combined_df_time %>% 
-  filter(month %in% c(9) & year %in% c(2023)) %>% 
+  filter(month %in% c(7) & year %in% c(2023)) %>% 
   ggplot(aes(y = water_potential_mean, 
              x = species,
              fill = pd_md)) +
-  geom_point() + 
+  geom_point(position = position_dodge(width = 0.75)) + 
   geom_boxplot(alpha = .3) + 
   scale_fill_manual(
     values = c("pd" = "#4682B4", "md" = "lightcoral"), 
     labels = c("pd" = "Predawn", "md" = "Midday")) +
   labs(y = "Mean Water Potential",
        x = "Species", 
+       title = "July 2023",
        fill = "Time:") + 
   theme(
 panel.background = element_rect(colour = 'black'),     
@@ -296,23 +298,25 @@ text = element_text(family = "Times New Roman"),
     axis.title.x = element_text(size = 25, margin = margin(t = 10)),
     axis.text = element_text(size = 12),
 legend.title = element_text(size = 15),
-    legend.text = element_text(size = 12))
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)))
 #Water Potential Midday vs. Predawn Figure 2#
 ```
 
 ```{r}
 combined_df_time %>% 
-  filter(month %in% c(9) & year %in% c(2022)) %>% 
+  filter(month %in% c(7) & year %in% c(2025)) %>% 
   ggplot(aes(y = water_potential_mean, 
              x = species,
              fill = pd_md)) +
-  geom_point() + 
+  geom_point(position = position_dodge(width = 0.75)) + 
   geom_boxplot(alpha = .3) + 
   scale_fill_manual(
     values = c("pd" = "#4682B4", "md" = "lightcoral"), 
     labels = c("pd" = "Predawn", "md" = "Midday")) +
   labs(y = "Mean Water Potential",
        x = "Species", 
+       title = "July 2025",
        fill = "Time:") + 
   theme(
 panel.background = element_rect(colour = 'black'),     
@@ -322,14 +326,57 @@ text = element_text(family = "Times New Roman"),
     axis.title.x = element_text(size = 25, margin = margin(t = 10)),
     axis.text = element_text(size = 12),
 legend.title = element_text(size = 15),
-    legend.text = element_text(size = 12))
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)))
 #Water Potential Midday vs. Predawn Figure 3#
 ```
 
 ```{r}
 combined_df_time %>% 
-filter(year == 2024,
-         month == "9",         
+  # 1. Update the filter to include 2022, 2023, and 2025 all at once
+  filter(month == 7 & year %in% c(2022, 2023, 2025)) %>% 
+  
+  ggplot(aes(y = water_potential_mean, 
+             x = species,
+             fill = pd_md)) +
+  
+  # Note: I added outlier.shape = NA back in so your boxplot doesn't double-plot outliers!
+  geom_boxplot(alpha = .3) + 
+  geom_point(position = position_dodge(width = 0.75)) + 
+  
+  # 2. Add facet_wrap to create the three separate panels based on the year
+  facet_wrap(~ year, ncol = 3) + 
+  
+  scale_fill_manual(
+    values = c("pd" = "#4682B4", "md" = "lightcoral"), 
+    labels = c("pd" = "Predawn", "md" = "Midday")) +
+  
+  # 3. Adjust your titles so they make sense for the whole combined graphic
+  labs(y = "Mean Water Potential",
+       x = "Species", 
+       title = "Water Potential in July",
+       fill = "Time:") + 
+       
+  theme(
+    panel.background = element_rect(colour = 'black'),     
+    text = element_text(family = "Times New Roman"), 
+    legend.position = "right",                    
+    axis.title.y = element_text(size = 20, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 20, margin = margin(t = 10)),
+    axis.text = element_text(size = 6),
+    legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+    plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+    # 4. Optional: This formats the grey header boxes (the "strips") above each panel
+    strip.text = element_text(size = 15, face = "bold", family = "Times New Roman")
+  )
+```
+
+
+```{r}
+combined_df_time %>% 
+filter(year == 2022,
+         month == "7",         
        pd_md == "md") %>% 
   ggplot(aes(x = mean_angle, 
              y = water_potential_mean, 
@@ -342,7 +389,7 @@ filter(year == 2024,
   labs(y = "Mean Water Potential",
        x = "Mean Angle (Degrees)", 
        title = "Water Potential at Midday",
-       subtitle = "September 2024",
+       subtitle = "July 2022",
        color = "Species:",
        shape = "Species:") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
@@ -362,7 +409,7 @@ plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 ```{r}
 combined_df_time %>% 
 filter(year == 2023,
-         month == "9",         
+         month == "7",         
        pd_md == "md") %>% 
   ggplot(aes(x = mean_angle, 
              y = water_potential_mean, 
@@ -375,7 +422,7 @@ filter(year == 2023,
   labs(y = "Mean Water Potential",
        x = "Mean Angle (Degrees)", 
        title = "Water Potential at Midday",
-       subtitle = "September 2023",
+       subtitle = "July 2023",
        color = "Species:",
        shape = "Species:") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
@@ -394,8 +441,8 @@ plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 
 ```{r}
 combined_df_time %>% 
-filter(year == 2022,
-         month == "9",         
+filter(year == 2025,
+         month == "7",         
        pd_md == "md") %>% 
   ggplot(aes(x = mean_angle, 
              y = water_potential_mean, 
@@ -408,7 +455,7 @@ filter(year == 2022,
   labs(y = "Mean Water Potential",
        x = "Mean Angle (Degrees)", 
        title = "Water Potential at Midday",
-       subtitle = "September 2022",
+       subtitle = "July 2025",
        color = "Species:",
        shape = "Species:") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
@@ -427,8 +474,8 @@ plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 
 ```{r}
 combined_df_time %>% 
-filter(year == 2024,
-         month == "9",         
+filter(year == 2022,
+         month == "7",         
        pd_md == "pd") %>% 
   ggplot(aes(x = mean_angle, 
              y = water_potential_mean, 
@@ -441,7 +488,7 @@ filter(year == 2024,
   labs(y = "Mean Water Potential",
        x = "Mean Angle (Degrees)", 
        title = "Water Potential at Predawn",
-       subtitle = "September 2024",
+       subtitle = "July 2022",
        color = "Species:",
        shape = "Species:") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
@@ -461,7 +508,7 @@ plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 ```{r}
 combined_df_time %>% 
 filter(year == 2023,
-         month == "9",         
+         month == "7",         
        pd_md == "pd") %>% 
   ggplot(aes(x = mean_angle, 
              y = water_potential_mean, 
@@ -474,7 +521,7 @@ filter(year == 2023,
   labs(y = "Mean Water Potential",
        x = "Mean Angle (Degrees)", 
        title = "Water Potential at Predawn",
-       subtitle = "September 2023",
+       subtitle = "July 2023",
        color = "Species:",
        shape = "Species:") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
@@ -493,8 +540,8 @@ plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 
 ```{r}
 combined_df_time %>% 
-filter(year == 2022,
-         month == "9",         
+filter(year == 2025,
+         month == "7",         
        pd_md == "pd") %>% 
   ggplot(aes(x = mean_angle, 
              y = water_potential_mean, 
@@ -507,7 +554,7 @@ filter(year == 2022,
   labs(y = "Mean Water Potential",
        x = "Mean Angle (Degrees)", 
        title = "Water Potential at Predawn",
-       subtitle = "September 2022",
+       subtitle = "July 2025",
        color = "Species:",
        shape = "Species:") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
@@ -522,5 +569,25 @@ legend.title = element_text(size = 15),
 plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
 plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 #Water Potential at Predawn Figure 3#
+```
+
+```{r}
+figure_3_means <- combined_df_time %>% 
+  # 1. Use the exact same filter from your plot
+  filter(year == 2022,
+         month == "9",         
+         pd_md == "md") %>% 
+  
+  # 2. Group by species to get separate means for Q. agrifolia and Q. douglasii
+  group_by(species) %>% 
+  
+  # 3. Calculate the means
+  summarize(
+    avg_water_potential = mean(water_potential_mean, na.rm = TRUE),
+    avg_angle = mean(mean_angle, na.rm = TRUE)
+  )
+
+# Print the result to the console
+print(figure_3_means)
 ```
 
