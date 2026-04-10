@@ -12,15 +12,11 @@ library(janitor) #clean up datasets nicely
 library(here) #helpful for directing R around the computer
 ```
 
-Read in data: 
+Read in data:
 
 Write info here!
 
-Columns are these: 
-angle_of_photo_taken: how much the camera was tilted side-to-side. Ignoring if less than 5 degrees.
-angle_related_to_straight_line: relative to a vertical line, where < 90 is facing up, and >90 is facing down.
-z_axis: 90 = flat leaf is facing camera, 0 = leaf is only viewed from the side
-
+Columns are these: angle_of_photo_taken: how much the camera was tilted side-to-side. Ignoring if less than 5 degrees. angle_related_to_straight_line: relative to a vertical line, where \< 90 is facing up, and \>90 is facing down. z_axis: 90 = flat leaf is facing camera, 0 = leaf is only viewed from the side
 
 ```{r}
 #read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
@@ -41,8 +37,7 @@ leafangle_means_df <- leafangle_df %>%
 leafangle_df
 ```
 
-
-Add in the species data: 
+Add in the species data:
 
 ```{r}
 #read in the csv with the water potential data for each tree: 
@@ -52,7 +47,8 @@ tree_wp_df <- read_csv(here("processed-data", "sedgwick_mpas_allyears_20250829.c
 combined_df <- merge(leafangle_means_df, tree_wp_df, by = c("tree_number"))
 ```
 
-Make some figures: 
+Make some figures:
+
 ```{r}
 #use a function called ggplot to make figures
 combined_df %>% 
@@ -62,6 +58,7 @@ combined_df %>%
   geom_point() +
   geom_boxplot(alpha = .3)
 ```
+
 ```{r}
 #read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
 leafangle_df <- read_csv("scripts/Steven/leafangles.csv") %>% 
@@ -86,7 +83,6 @@ tree_wp_df <- read_csv(here("processed-data", "sedgwick_mpas_allyears_20250829.c
 combined_df <- merge(leafangle_means_df, tree_wp_df, by = c("tree_number"))
 ```
 
-
 #Plots
 
 ```{r}
@@ -99,7 +95,6 @@ combined_df %>%
   geom_boxplot(alpha = .3)
 ```
 
-
 ```{r}
 combined_df %>% 
   ggplot(aes(x = mean_angle, 
@@ -107,6 +102,7 @@ combined_df %>%
              fill = mean_angle)) +
   geom_col(width = 1)
 ```
+
 ```{r}
 combined_df %>% 
   ggplot(aes(x = mean_angle, 
@@ -115,6 +111,7 @@ combined_df %>%
   geom_point() +
   facet_wrap(~date)
 ```
+
 We need to make a column for week or month!
 
 ```{r}
@@ -157,7 +154,7 @@ combined_df_time %>%
   geom_smooth(method = "lm")
 ```
 
-Predawns vs. leaf angle: 
+Predawns vs. leaf angle:
 
 ```{r}
 combined_df_time %>% 
@@ -171,6 +168,7 @@ combined_df_time %>%
   facet_wrap(~year*month, scales = "free") +
   geom_smooth(method = "lm")
 ```
+
 ```{r}
 combined_df_time %>% 
   filter(year %in% c(2024, 2025),
@@ -184,28 +182,26 @@ combined_df_time %>%
   geom_smooth(method = "lm")
 ```
 
-#####To do: 
-- Make the water potential figure prettier, easier to read   DONE
-- Make versions for different months   DONE
-- Make the leaf angle and water potentials plots prettier   DONE
-- If time, add more measurements, but not necessarily needed   X 
-- Summarize the papers youve read (6), 2-3 sentences each and how its relevant for your project   DONE
+#####To do: - Make the water potential figure prettier, easier to read DONE - Make versions for different months DONE - Make the leaf angle and water potentials plots prettier DONE - If time, add more measurements, but not necessarily needed X - Summarize the papers youve read (6), 2-3 sentences each and how its relevant for your project DONE
 
-#####April 2: 
+#####April 2:
 
-- Double check that sept is actually teh driest for each year   DONE
-- Make side-by-side graphs of each year/month that are interesting to compare across years
-- Run statistical tests on leaf angle ~ predawn (see bwlow)
-- Write abstract draft by 2/8, attend workshop if you can! See email from Lee.   DONE  
+-   Double check that sept is actually teh driest for each year DONE
 
-- Think about senior thesis and using LiDar data to get leaf angle, if you want :) 
+-   Make side-by-side graphs of each year/month that are interesting to compare across years DONE
+
+-   Run statistical tests on leaf angle \~ predawn (see below) DONE
+
+-   Write abstract draft by 2/8, attend workshop if you can! See email from Lee. DONE
+
+-   Think about senior thesis and using LiDar data to get leaf angle, if you want :)
 
 ```{r}
 #example stats: 
 df <- combined_df_time %>% 
-  filter() #filter the month and year you want to compare within, also filter to just predawns
+  filter(month %in% c(9) & year %in% c(2024)) #filter the month and year you want to compare within, also filter to just predawns
 
-model <- lm(leaf_angle_mean ~ water_potential_mean, data = df)
+model <- lm(mean_angle ~ water_potential_mean, data = df)
 summary(model) #look for p < 0.05 for significance
 ```
 
@@ -246,6 +242,8 @@ combined_df_time %>%
        fill = "Time") + 
   theme(panel.background = element_rect(colour='black'))
 ```
+
+#relevant data below (as of 4/9):
 
 ```{r}
 combined_df_time %>% 
@@ -370,24 +368,24 @@ combined_df_time %>%
     # 4. Optional: This formats the grey header boxes (the "strips") above each panel
     strip.text = element_text(size = 15, face = "bold", family = "Times New Roman")
   )
+#Side-By-Side Figure 1
 ```
-
 
 ```{r}
 combined_df_time %>% 
 filter(year == 2022,
          month == "7",         
        pd_md == "md") %>% 
-  ggplot(aes(x = mean_angle, 
-             y = water_potential_mean, 
+  ggplot(aes(x = water_potential_mean, 
+             y = mean_angle, 
              color = species, 
              shape = species)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
                                 "Quercus douglasii" = "darkgreen")) + 
-  labs(y = "Mean Water Potential",
-       x = "Mean Angle (Degrees)", 
+  labs(y = "Mean Angle (Degrees)",
+       x = "Mean Water Potential", 
        title = "Water Potential at Midday",
        subtitle = "July 2022",
        color = "Species:",
@@ -411,16 +409,16 @@ combined_df_time %>%
 filter(year == 2023,
          month == "7",         
        pd_md == "md") %>% 
-  ggplot(aes(x = mean_angle, 
-             y = water_potential_mean, 
+  ggplot(aes(x = water_potential_mean, 
+             y = mean_angle, 
              color = species, 
              shape = species)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
                                 "Quercus douglasii" = "darkgreen")) + 
-  labs(y = "Mean Water Potential",
-       x = "Mean Angle (Degrees)", 
+  labs(y = "Mean Angle (Degrees)",
+       x = "Mean Water Potential", 
        title = "Water Potential at Midday",
        subtitle = "July 2023",
        color = "Species:",
@@ -444,16 +442,16 @@ combined_df_time %>%
 filter(year == 2025,
          month == "7",         
        pd_md == "md") %>% 
-  ggplot(aes(x = mean_angle, 
-             y = water_potential_mean, 
+  ggplot(aes(x = water_potential_mean, 
+             y = mean_angle, 
              color = species, 
              shape = species)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
                                 "Quercus douglasii" = "darkgreen")) + 
-  labs(y = "Mean Water Potential",
-       x = "Mean Angle (Degrees)", 
+  labs(y = "Mean Angle (Degrees)",
+       x = "Mean Water Potential", 
        title = "Water Potential at Midday",
        subtitle = "July 2025",
        color = "Species:",
@@ -477,16 +475,16 @@ combined_df_time %>%
 filter(year == 2022,
          month == "7",         
        pd_md == "pd") %>% 
-  ggplot(aes(x = mean_angle, 
-             y = water_potential_mean, 
+  ggplot(aes(x = water_potential_mean, 
+             y = mean_angle, 
              color = species, 
              shape = species)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
                                 "Quercus douglasii" = "darkgreen")) + 
-  labs(y = "Mean Water Potential",
-       x = "Mean Angle (Degrees)", 
+  labs(y = "Mean Angle (Degrees)",
+       x = "Mean Water Potential", 
        title = "Water Potential at Predawn",
        subtitle = "July 2022",
        color = "Species:",
@@ -510,16 +508,16 @@ combined_df_time %>%
 filter(year == 2023,
          month == "7",         
        pd_md == "pd") %>% 
-  ggplot(aes(x = mean_angle, 
-             y = water_potential_mean, 
+  ggplot(aes(x = water_potential_mean, 
+             y = mean_angle, 
              color = species, 
              shape = species)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
                                 "Quercus douglasii" = "darkgreen")) + 
-  labs(y = "Mean Water Potential",
-       x = "Mean Angle (Degrees)", 
+  labs(y = "Mean Angle",
+       x = "Mean Water Potential", 
        title = "Water Potential at Predawn",
        subtitle = "July 2023",
        color = "Species:",
@@ -543,16 +541,16 @@ combined_df_time %>%
 filter(year == 2025,
          month == "7",         
        pd_md == "pd") %>% 
-  ggplot(aes(x = mean_angle, 
-             y = water_potential_mean, 
+  ggplot(aes(x = water_potential_mean, 
+             y = mean_angle, 
              color = species, 
              shape = species)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
                                 "Quercus douglasii" = "darkgreen")) + 
-  labs(y = "Mean Water Potential",
-       x = "Mean Angle (Degrees)", 
+  labs(y = "Mean Angle (Degrees)",
+       x = "Mean Water Potential", 
        title = "Water Potential at Predawn",
        subtitle = "July 2025",
        color = "Species:",
@@ -569,6 +567,49 @@ legend.title = element_text(size = 15),
 plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
 plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 #Water Potential at Predawn Figure 3#
+```
+
+```{r}
+combined_df_time %>% 
+  # 1. Update the filter to include 2022, 2023, and 2025 all at once
+  filter(month == 7, pd_md == "pd", year %in% c(2022, 2023, 2025)) %>% 
+  
+  ggplot(aes(x = water_potential_mean, 
+             y = mean_angle,
+             color = species, 
+             shape = species)) +
+  
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  
+  # 2. Add facet_wrap to create the three separate panels based on the year
+facet_wrap(~ year, ncol = 3, scales = "free_x") +
+  
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  
+labs(y = "Mean Angle (Degrees)",
+       x = "Mean Water Potential", 
+       title = "Water Potential in July (Predawn)",
+       color = "Species:",
+       shape = "Species:") + 
+       
+  theme(
+    panel.background = element_rect(colour = 'black'),     
+    text = element_text(family = "Times New Roman"), 
+    legend.position = "right",                    
+    axis.title.y = element_text(size = 20, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 20, margin = margin(t = 10)),
+    axis.text = element_text(size = 8),
+    legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+    plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+    # 4. Optional: This formats the grey header boxes (the "strips") above each panel
+    strip.text = element_text(size = 15, face = "bold", family = "Times New Roman")
+  )
+#Side-By-Side Figure 2
 ```
 
 ```{r}
@@ -589,5 +630,38 @@ figure_3_means <- combined_df_time %>%
 
 # Print the result to the console
 print(figure_3_means)
+```
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7) & year %in% c(2022)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.9349
+```
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7) & year %in% c(2023)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.6228
+```
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7) & year %in% c(2025)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.8843
 ```
 
