@@ -23,7 +23,7 @@ Columns are these: angle_of_photo_taken: how much the camera was tilted side-to-
 #leafangle_df <- read_csv("scripts/steven/leafangles.csv") %>% 
 #  clean_names() 
 
-leafangle_df <- read_csv(here("scripts", "steven", "leafangles.csv")) %>% 
+leafangle_df <- read_csv(here("leafangles.csv")) %>% 
   clean_names() 
   
 leafangle_means_df <- leafangle_df %>% 
@@ -61,8 +61,8 @@ combined_df %>%
 
 ```{r}
 #read in the data using read_csv(). Make sure your data is in quotes, and that its in the same folder as your .Rmd file. 
-leafangle_df <- read_csv("scripts/Steven/leafangles.csv") %>% 
-  clean_names() 
+# leafangle_df <- read_csv("scripts/Steven/leafangles.csv") %>% 
+#   clean_names() 
   
 leafangle_means_df <- leafangle_df %>% 
   group_by(tree_number) %>% #says "cluster my data into groups by tree_id
@@ -196,6 +196,20 @@ combined_df_time %>%
 
 -   Think about senior thesis and using LiDar data to get leaf angle, if you want :)
 
+
+######April 10: 
+
+- See if leaf angle differs by species (probably not)
+
+- Make a faceted plot of Middays by year (like you did for predawns)
+
+- Run stats on the middays 
+
+- LAI (Leaf Area Index): read up on LAI, see if it relates to leaf angle or water potentials
+
+- Leaf number vs. predawns vs. LMA (Indra will find this data)
+
+
 ```{r}
 #example stats: 
 df <- combined_df_time %>% 
@@ -248,7 +262,7 @@ combined_df_time %>%
 ```{r}
 combined_df_time %>% 
   filter(month %in% c(7) & year %in% c(2022)) %>% 
-  ggplot(aes(y = water_potential_mean, 
+  ggplot(aes(y = -1*water_potential_mean, 
              x = species,
              fill = pd_md)) +
   geom_point(position = position_dodge(width = 0.75)) + 
@@ -256,7 +270,7 @@ combined_df_time %>%
   scale_fill_manual(
     values = c("pd" = "#4682B4", "md" = "lightcoral"), 
     labels = c("pd" = "Predawn", "md" = "Midday")) +
-  labs(y = "Mean Water Potential",
+  labs(y = "Mean Water Potential (MPa)",
        x = "Species", 
        title = "July 2022",
        fill = "Time:") + 
@@ -370,13 +384,14 @@ combined_df_time %>%
   )
 #Side-By-Side Figure 1
 ```
+We didnt see a relationship between angle and predawns maybe because trees werent super stressed in 2025 when we took pics. 2022 might have been different. 
 
 ```{r}
 combined_df_time %>% 
 filter(year == 2022,
          month == "7",         
        pd_md == "md") %>% 
-  ggplot(aes(x = water_potential_mean, 
+  ggplot(aes(x = -1*water_potential_mean, 
              y = mean_angle, 
              color = species, 
              shape = species)) +
@@ -404,12 +419,15 @@ plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 #Water Potential at Midday Figure 1#
 ```
 
+Add color to legend ^ 
+
+
 ```{r}
 combined_df_time %>% 
 filter(year == 2023,
          month == "7",         
        pd_md == "md") %>% 
-  ggplot(aes(x = water_potential_mean, 
+  ggplot(aes(x = -1*water_potential_mean, 
              y = mean_angle, 
              color = species, 
              shape = species)) +
@@ -442,7 +460,7 @@ combined_df_time %>%
 filter(year == 2025,
          month == "7",         
        pd_md == "md") %>% 
-  ggplot(aes(x = water_potential_mean, 
+  ggplot(aes(x = -1*water_potential_mean, 
              y = mean_angle, 
              color = species, 
              shape = species)) +
@@ -475,7 +493,7 @@ combined_df_time %>%
 filter(year == 2022,
          month == "7",         
        pd_md == "pd") %>% 
-  ggplot(aes(x = water_potential_mean, 
+  ggplot(aes(x = -1*water_potential_mean, 
              y = mean_angle, 
              color = species, 
              shape = species)) +
@@ -508,7 +526,7 @@ combined_df_time %>%
 filter(year == 2023,
          month == "7",         
        pd_md == "pd") %>% 
-  ggplot(aes(x = water_potential_mean, 
+  ggplot(aes(x = -1*water_potential_mean, 
              y = mean_angle, 
              color = species, 
              shape = species)) +
@@ -541,7 +559,7 @@ combined_df_time %>%
 filter(year == 2025,
          month == "7",         
        pd_md == "pd") %>% 
-  ggplot(aes(x = water_potential_mean, 
+  ggplot(aes(x = -1*water_potential_mean, 
              y = mean_angle, 
              color = species, 
              shape = species)) +
@@ -570,11 +588,20 @@ plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
 ```
 
 ```{r}
+#number of trees: 
+
+combined_df_time %>% 
+  select(tree_number, species) %>% 
+  distinct() %>% 
+  summarise(n = n())
+```
+
+```{r}
 combined_df_time %>% 
   # 1. Update the filter to include 2022, 2023, and 2025 all at once
   filter(month == 7, pd_md == "pd", year %in% c(2022, 2023, 2025)) %>% 
   
-  ggplot(aes(x = water_potential_mean, 
+  ggplot(aes(x = -1*water_potential_mean, 
              y = mean_angle,
              color = species, 
              shape = species)) +
