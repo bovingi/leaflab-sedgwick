@@ -203,7 +203,7 @@ combined_df_time %>%
 
 - Make a faceted plot of Middays by year (like you did for predawns)   DONE
 
-- Run stats on the middays 
+- Run stats on the middays   DONE 
 
 - LAI (Leaf Area Index): read up on LAI, see if it relates to leaf angle or water potentials
 
@@ -653,7 +653,38 @@ labs(y = "Mean Angle (Degrees)",
     # 4. Optional: This formats the grey header boxes (the "strips") above each panel
     strip.text = element_text(size = 15, face = "bold", family = "Times New Roman")
   )
-#Side-By-Side Figure 2
+#Side-By-Side Figure 2 (Predawn)
+```
+
+```{r}
+combined_df_time %>% 
+filter(year == 2023,
+         month == 7,         
+       pd_md == "md") %>% 
+  ggplot(aes(x = -1*water_potential_mean, 
+             y = mean_angle, 
+             color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+                                "Quercus douglasii" = "darkgreen")) + 
+  labs(y = "Mean Angle (Degrees)",
+       x = "Mean Water Potential (MPa)", 
+       title = "Water Potential at Midday",
+       subtitle = "July 2025",
+       color = "Species:",
+       shape = "Species:") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(panel.background = element_rect(colour = 'black'),   
+        text = element_text(family = "Times New Roman"),
+  axis.title.y = element_text(size = 17, margin = margin(r = 10)), 
+    axis.title.x = element_text(size = 17, margin = margin(t = 10)),
+    axis.text = element_text(size = 12),
+legend.title = element_text(size = 15),
+    legend.text = element_text(size = 12),
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)),
+plot.subtitle = element_text(hjust = 0.5, size = 20, margin = margin(b = 10)))
+#Water Potential at Midday
 ```
 
 ```{r}
@@ -678,7 +709,7 @@ facet_wrap(~ year, ncol = 3, scales = "free_x") +
   
 labs(y = "Mean Angle (Degrees)",
        x = "Mean Water Potential (MPa)", 
-       title = "Water Potential in July (Predawn)",
+       title = "Water Potential in July (Midday)",
        color = "Species:",
        shape = "Species:") + 
        
@@ -695,27 +726,7 @@ labs(y = "Mean Angle (Degrees)",
     # 4. Optional: This formats the grey header boxes (the "strips") above each panel
     strip.text = element_text(size = 15, face = "bold", family = "Times New Roman")
   )
-#Side-By-Side Figure 3
-```
-
-```{r}
-figure_3_means <- combined_df_time %>% 
-  # 1. Use the exact same filter from your plot
-  filter(year == 2022,
-         month == "9",         
-         pd_md == "md") %>% 
-  
-  # 2. Group by species to get separate means for Q. agrifolia and Q. douglasii
-  group_by(species) %>% 
-  
-  # 3. Calculate the means
-  summarize(
-    avg_water_potential = mean(water_potential_mean, na.rm = TRUE),
-    avg_angle = mean(mean_angle, na.rm = TRUE)
-  )
-
-# Print the result to the console
-print(figure_3_means)
+#Side-By-Side Figure 3 (Midday)
 ```
 
 ```{r}
@@ -751,3 +762,68 @@ summary(model) #look for p < 0.05 for significance
 #p-value = 0.8843
 ```
 
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7), pd_md %in% "pd", year %in% c(2022)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.8564
+```
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7), pd_md %in% "pd", year %in% c(2023)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.9916
+```
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7), pd_md %in% "pd", year %in% c(2025)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.8069
+```
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7), pd_md %in% "md", year %in% c(2022)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.5896
+```
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7), pd_md %in% "md", year %in% c(2023)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.1929
+```
+
+```{r}
+#example stats: 
+df <- combined_df_time %>% 
+  filter(month %in% c(7), pd_md %in% "md", year %in% c(2025)) #filter the month and year you want to compare within, also filter to just predawns
+
+model <- lm(mean_angle ~ water_potential_mean, data = df)
+summary(model) #look for p < 0.05 for significance
+
+#p-value = 0.6333
+```
