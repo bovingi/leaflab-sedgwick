@@ -821,7 +821,7 @@ leaflai_df %>%
                                 "L" = "Quercus agrifolia")) + 
   labs(y = "LAI",
        x = "Mean Angle (Degrees)", 
-       title = "Leaf Angle and LAI in September",
+       title = "Leaf Angle and LAI (September)",
        color = "Species:",
        shape = "Species:") + 
   theme(plot.title = element_text(hjust = 0.5)) + 
@@ -833,6 +833,7 @@ leaflai_df %>%
 legend.title = element_text(size = 13),
     legend.text = element_text(size = 10),
 plot.title = element_text(hjust = 0.5, size = 22, face = "bold", margin = margin(b = 10)))
+#LAI and Leaf Angle Figure
 ```
 
 ```{r}
@@ -841,7 +842,7 @@ waterlai_df <- merge(tree_wp_df, LAI_df, by = c("tree_number"))
 
 ```{r}
 waterlai_df %>%
-#TBDDD
+#LAI and Water Potential Figure???
 ```
 
 ```{r}
@@ -856,7 +857,7 @@ LAI_df %>%
   scale_fill_manual(values = c("L" = "red", "B" = "blue")) + 
   labs(y = "LAI",
        x = "Species",
-       title = "September LAI",
+       title = "LAI in September",
   ) + 
   theme(legend.position = "none",
         panel.background = element_rect(colour = 'black'),     
@@ -865,4 +866,5 @@ text = element_text(family = "Times New Roman"),
     axis.title.x = element_text(size = 20, margin = margin(t = 10)),
     axis.text = element_text(size = 12),
 plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)))
+#September LAI Relative to Species Figure
 ```
