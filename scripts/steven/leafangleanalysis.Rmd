@@ -210,6 +210,12 @@ combined_df_time %>%
 - Leaf number vs. predawns vs. LMA (Indra will find this data)
 
 
+######April 17: 
+
+- Make a poster draft
+
+- 
+
 ```{r}
 #example stats: 
 df <- combined_df_time %>% 

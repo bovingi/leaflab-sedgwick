@@ -108,7 +108,7 @@ wp_all <- bind_rows(wp_2025,
 
 #look for outliers: 
 ```{r}
-wp_wide <-wp_all  %>% 
+wp_wide <- wp_all  %>% 
   pivot_wider(names_from = c(pd_md),
               values_from = c(water_potential_mpa), 
               values_fn = function(x) mean(x, na.rm = TRUE)) %>% 
