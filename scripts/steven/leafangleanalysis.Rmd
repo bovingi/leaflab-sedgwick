@@ -391,7 +391,7 @@ ggplot(aes(y = mean_angle,
   geom_point(position = position_dodge(width = 0.75)) + 
   geom_boxplot(alpha = .3) +
   scale_fill_manual(
-    values = c("Quercus agrifolia" = "darkorange", "Quercus douglasii" = "purple")) + 
+    values = c("Quercus agrifolia" = "darkgreen", "Quercus douglasii" = "purple")) + 
   labs(y = "Mean Angle (Degrees)",
        x = "Species",
        title = "Leaf Angle Between Species",
@@ -402,7 +402,7 @@ text = element_text(family = "Times New Roman"),
     axis.title.y = element_text(size = 20, margin = margin(r = 10)), 
     axis.title.x = element_text(size = 20, margin = margin(t = 10)),
     axis.text = element_text(size = 12),
-plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10)))
+plot.title = element_text(hjust = 0.5, size = 25, face = "bold", margin = margin(b = 10))) 
 
 #Leaf Angle Relative to Species Figure
 ```
@@ -581,8 +581,8 @@ filter(year == 2025,
              color = species)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
-                                "Quercus douglasii" = "darkgreen")) + 
+  scale_color_manual(values = c("Quercus agrifolia" = "darkgreen", 
+                                "Quercus douglasii" = "purple")) + 
   labs(y = "Mean Angle (Degrees)",
        x = "Mean Water Potential (MPa)", 
        title = "Water Potential at Predawn",
@@ -622,7 +622,7 @@ combined_df_time %>%
   
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00", 
+  scale_color_manual(values = c("Quercus agrifolia" = "#FFCC00",
                                 "Quercus douglasii" = "darkgreen")) + 
   
   # 2. Add facet_wrap to create the three separate panels based on the year
